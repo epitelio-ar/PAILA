@@ -1,0 +1,60 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+body { display: flex; flex-direction: column; grid-template-columns: none; }
+.barra { display: flex; align-items: center; gap: 18px; padding: 12px 26px; background: #15181c; border-bottom: 1px solid #272c33; }
+.barra .logo { margin: 0; font-size: 28px; }
+.buscar { flex: 1; background: #0e1013; border: 1px solid #272c33; border-radius: 999px; padding: 8px 16px; color: #66707b; font-size: 14px; }
+.iconos { display: flex; gap: 16px; color: #8e97a3; font-size: 14px; }
+.tabs { display: flex; padding: 0 26px; background: #121519; border-bottom: 1px solid #272c33; }
+.tab { display: flex; align-items: center; gap: 9px; padding: 14px 18px 12px; color: #8e97a3; font-weight: 600; border-bottom: 3px solid transparent; position: relative; }
+.tab .n { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #3a424c; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.tab.ok .n { background: #46c06e; border-color: #46c06e; color: #0b1a10; }
+.tab.rep .n { background: #f5d84a; border-color: #f5d84a; color: #1a1600; }
+.tab.on { color: #fff; border-bottom-color: #ff9a3c; }
+.tab.on .n { background: #ff9a3c; border-color: #ff9a3c; color: #121212; }
+.flecha { color: #3a424c; align-self: center; }
+.cuerpo { flex: 1; display: grid; grid-template-columns: 250px 1fr; overflow: hidden; }
+.partes { padding: 22px 16px; border-right: 1px solid #272c33; display: flex; flex-direction: column; gap: 6px; }
+.parte { padding: 10px 12px; border-radius: 8px; display: flex; gap: 10px; align-items: flex-start; }
+.parte .n { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 2px solid #3a424c; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #8e97a3; }
+.parte.ok .n { background: #46c06e; border-color: #46c06e; color: #0b1a10; }
+.parte.on { background: #1d2227; outline: 2px solid #ff9a3c; }
+.parte.on .n { background: #ff9a3c; border-color: #ff9a3c; color: #121212; }
+.parte small { display: block; color: #8e97a3; font-size: 12px; }
+.main { padding: 26px 36px; }
+.aviso { background: rgba(245,216,74,.1); border: 1px solid rgba(245,216,74,.4); color: #f5d84a; border-radius: 8px; padding: 10px 14px; font-size: 14px; margin-bottom: 18px; }
+.filas { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 20px; }
+.fila { display: grid; grid-template-columns: 1fr 30px 1fr; gap: 10px; padding: 10px 14px; font-family: Consolas, monospace; font-size: 13px; }
+.fila .de { color: #8e97a3; } .fila .a { color: #46c06e; }
+.player { height: 62px; background: #15181c; border-top: 1px solid #272c33; display: flex; align-items: center; padding: 0 26px; gap: 16px; color: #8e97a3; font-size: 14px; }
+.player .tapa { width: 40px; height: 40px; border-radius: 6px; background: #272c33; }
+</style></head><body>
+<div class="etiqueta">D · PESTAÑAS QUE AVANZAN</div>
+<div class="barra"><div class="logo">PAILA</div><div class="buscar">Buscar artista, título, disco…</div><div class="iconos"><span>▷ Escuchando</span><span>↺ Historial</span><span>🗑 Papelera</span><span>⚙</span></div></div>
+<nav class="tabs">
+  <div class="tab ok"><span class="n">✓</span>Conocer</div><span class="flecha">›</span>
+  <div class="tab ok"><span class="n">✓</span>Limpiar</div><span class="flecha">›</span>
+  <div class="tab on"><span class="n">3</span>Nombres y datos</div><span class="flecha">›</span>
+  <div class="tab rep"><span class="n">!</span>Ordenar</div><span class="flecha">›</span>
+  <div class="tab"><span class="n">5</span>Mejorar el sonido</div><span class="flecha">›</span>
+  <div class="tab"><span class="n">6</span>Usar</div>
+</nav>
+<div class="cuerpo">
+  <aside class="partes">
+    <div class="parte ok"><span class="n">✓</span><div>Nombres<small>212 arreglados</small></div></div>
+    <div class="parte on"><span class="n">2</span><div><b>Datos de internet</b><small>disco, año y género</small></div></div>
+    <div class="parte"><span class="n">3</span><div>Discos y tapas<small>después de los datos</small></div></div>
+  </aside>
+  <main class="main">
+    <h1 style="font-size:36px">2 · Datos de internet</h1>
+    <p class="sub">PAILA buscó el disco, el año y el género de 144 temas. Revisá y proponé: nada cambia hasta Aplicar.</p>
+    <div class="aviso">⟲ "Ordenar" quedó para repasar: cambiaste 212 nombres, y 48 temas van a ir a otra carpeta.</div>
+    <div class="filas">
+      <div class="card fila"><span class="de">La Renga — Arte infernal · sin disco</span><span>→</span><span class="a">Insoportablemente vivo · 2001 · Rock</span></div>
+      <div class="card fila"><span class="de">Shakira — Te dejo Madrid · sin año</span><span>→</span><span class="a">Laundry Service · 2001 · Pop</span></div>
+      <div class="card fila"><span class="de">Divididos — El arriero · Género "Other"</span><span>→</span><span class="a">40 dibujos ahí en el piso · 1989 · Rock</span></div>
+    </div>
+    <span class="btn big">Proponer 140 cambios</span> <span class="muted small" style="margin-left:14px">Después: 3 · Discos y tapas</span>
+  </main>
+</div>
+<div class="player"><div class="tapa"></div>Elegí un tema y dale play</div>
+</body></html>

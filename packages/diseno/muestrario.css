@@ -1,0 +1,19 @@
+/* Estilos del muestrario (pantalla oculta de desarrollo): solo ordena las muestras; los componentes salen de componentes.css. */
+.mu { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: var(--sp-5); align-items: start; }
+.mu-app { font-size: var(--fs-md); background: var(--fondo); color: var(--texto); border: 1px solid var(--borde); border-radius: var(--r-lg); padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.mu-app > h2 { display: flex; align-items: center; gap: var(--sp-3); }
+.mu-sec { display: flex; flex-direction: column; gap: var(--sp-3); }
+.mu-sec > h4 { color: var(--texto-suave); font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: .08em; }
+.mu-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+.mu-cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 96px; }
+.mu-cell > small { color: var(--texto-tenue); font-size: var(--fs-xs); }
+.mu-sw { width: 100px; height: 44px; border-radius: var(--r-md); border: 1px solid var(--borde); }
+.mu-sw-name { font-size: var(--fs-xs); color: var(--texto-suave); }
+.mu-hover .btn, .mu-hover .btn:not(:disabled) { /* muestra "encima" sin mouse */ }
+.mu-hover .btn { background: var(--acento-hover); }
+.mu-hover .btn.ghost { background: var(--superficie-3); border-color: var(--borde-fuerte); }
+.mu-hover .btn.danger { filter: brightness(1.12); background: var(--error); }
+.mu-type > div { margin: 2px 0; }
+.mu-space { display: flex; align-items: flex-end; gap: var(--sp-3); }
+.mu-space i { display: block; background: var(--acento); border-radius: 2px; }
+.mu-box { width: 72px; height: 48px; background: var(--superficie-2); border: 1px solid var(--borde); display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); color: var(--texto-suave); }

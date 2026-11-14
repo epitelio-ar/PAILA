@@ -1,0 +1,196 @@
+diff --git a/Soulseek.NET/src/Messaging/Handlers/ServerMessageHandler.cs b/Soulseek.NET/src/Messaging/Handlers/ServerMessageHandler.cs
+index d96979a..1697976 100644
+--- a/Soulseek.NET/src/Messaging/Handlers/ServerMessageHandler.cs
++++ b/Soulseek.NET/src/Messaging/Handlers/ServerMessageHandler.cs
+@@ -1,5 +1,8 @@
+ ﻿// <copyright file="ServerMessageHandler.cs" company="JP Dillingham">
+ //     Copyright (c) JP Dillingham.
++//     Copyright (c) 2026 Bllly Shears
++//     Modified: server-solicited peer message connections (ConnectToPeer, type P) go through
++//     SolicitedConnectionThrottle, so a popular search can not open thousands of connections at once.
+ //
+ //     This program is free software: you can redistribute it and/or modify
+ //     it under the terms of the GNU General Public License as published by
+@@ -401,7 +404,19 @@ namespace Soulseek.Messaging.Handlers
+                             else if (connectToPeerResponse.Type == Constants.ConnectionType.Peer)
+                             {
+                                 Diagnostic.Debug($"Received message ConnectToPeer request from {connectToPeerResponse.Username} ({connectToPeerResponse.IPEndPoint})");
+-                                await SoulseekClient.PeerConnectionManager.GetOrAddMessageConnectionAsync(connectToPeerResponse).ConfigureAwait(false);
++
++                                // NAPIA patch: a user we're downloading from goes straight through; the rest (mostly search
++                                // results) go through the throttle, so a popular search can't flood the router.
++                                var downloadingFrom = !SoulseekClient.DownloadDictionary.IsEmpty && SoulseekClient.DownloadDictionary.Values.Any(d => d.Username == connectToPeerResponse.Username);
++
++                                if (downloadingFrom)
++                                {
++                                    await SoulseekClient.PeerConnectionManager.GetOrAddMessageConnectionAsync(connectToPeerResponse).ConfigureAwait(false);
++                                }
++                                else if (!await SolicitedConnectionThrottle.RunAsync(() => SoulseekClient.PeerConnectionManager.GetOrAddMessageConnectionAsync(connectToPeerResponse)).ConfigureAwait(false))
++                                {
++                                    Diagnostic.Debug($"Dropped message ConnectToPeer request from {connectToPeerResponse.Username} ({connectToPeerResponse.IPEndPoint}): too many in progress ({SolicitedConnectionThrottle.Dropped} dropped so far)");
++                                }
+                             }
+                             else if (connectToPeerResponse.Type == Constants.ConnectionType.Distributed)
+                             {
+diff --git a/Soulseek.NET/src/Network/SolicitedConnectionThrottle.cs b/Soulseek.NET/src/Network/SolicitedConnectionThrottle.cs
+new file mode 100644
+index 0000000..6bb2783
+--- /dev/null
++++ b/Soulseek.NET/src/Network/SolicitedConnectionThrottle.cs
+@@ -0,0 +1,121 @@
++// <copyright file="SolicitedConnectionThrottle.cs" company="Bllly Shears">
++//     Copyright (c) 2026 Bllly Shears.
++//
++//     This program is free software: you can redistribute it and/or modify
++//     it under the terms of the GNU General Public License as published by
++//     the Free Software Foundation, version 3.
++//
++//     This program is distributed in the hope that it will be useful,
++//     but WITHOUT ANY WARRANTY; without even the implied warranty of
++//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//     GNU General Public License for more details.
++//
++//     You should have received a copy of the GNU General Public License
++//     along with this program.  If not, see https://www.gnu.org/licenses/.
++//
++//     This program is distributed with Additional Terms pursuant to Section 7
++//     of the GPLv3.  See the LICENSE file in the root directory of this
++//     project for the complete terms and conditions.
++//
++//     SPDX-FileCopyrightText: Bllly Shears
++//     SPDX-License-Identifier: GPL-3.0-only
++// </copyright>
++
++namespace Soulseek.Network
++{
++    using System;
++    using System.Threading;
++    using System.Threading.Tasks;
++
++    /// <summary>
++    ///     Limits the outbound connections that the server asks us to make (ConnectToPeer, type "P").
++    /// </summary>
++    /// <remarks>
++    ///     When our listening port can't be reached, every peer with search results asks the server to make us connect to
++    ///     them. A popular search produces thousands of these requests within a few seconds; opening all of them at once
++    ///     overflows the connection table of many home routers, which then drops every new connection (downloads included)
++    ///     for seconds to minutes. This keeps a small number in flight, spaces their start, and drops the ones that waited
++    ///     too long (losing some search results, never a download). Tunable with environment variables:
++    ///     SOULSEEK_SOLICITED_MAX (in flight, default 48), SOULSEEK_SOLICITED_PER_SECOND (default 25) and
++    ///     SOULSEEK_SOLICITED_WAIT_MS (max wait in the queue, default 6000). SOULSEEK_SOLICITED_MAX=0 turns it off.
++    /// </remarks>
++    internal static class SolicitedConnectionThrottle
++    {
++        private static readonly int Max = Read("SOULSEEK_SOLICITED_MAX", 48);
++        private static readonly int PerSecond = Math.Max(1, Read("SOULSEEK_SOLICITED_PER_SECOND", 25));
++        private static readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(Read("SOULSEEK_SOLICITED_WAIT_MS", 6000));
++        private static readonly SemaphoreSlim InFlight = new SemaphoreSlim(Math.Max(1, Max));
++        private static readonly object SpacingLock = new object();
++        private static DateTime nextStart = DateTime.MinValue;
++        private static long dropped;
++
++        /// <summary>
++        ///     Gets a value indicating whether the throttle is on.
++        /// </summary>
++        public static bool Enabled => Max > 0;
++
++        /// <summary>
++        ///     Gets how many requests were dropped since the start.
++        /// </summary>
++        public static long Dropped => Interlocked.Read(ref dropped);
++
++        /// <summary>
++        ///     Runs <paramref name="connect"/> when there's room, or returns false if it would wait longer than allowed.
++        /// </summary>
++        /// <param name="connect">The connection attempt.</param>
++        /// <returns>False if the request was dropped.</returns>
++        public static async Task<bool> RunAsync(Func<Task> connect)
++        {
++            if (!Enabled)
++            {
++                await connect().ConfigureAwait(false);
++                return true;
++            }
++
++            var deadline = DateTime.UtcNow + MaxWait;
++
++            // spacing: reserve the next start slot; if it's past the deadline, drop without reserving it
++            TimeSpan delay;
++            lock (SpacingLock)
++            {
++                var now = DateTime.UtcNow;
++                var start = nextStart > now ? nextStart : now;
++
++                if (start > deadline)
++                {
++                    Interlocked.Increment(ref dropped);
++                    return false;
++                }
++
++                nextStart = start + TimeSpan.FromSeconds(1.0 / PerSecond);
++                delay = start - now;
++            }
++
++            if (delay > TimeSpan.Zero)
++            {
++                await Task.Delay(delay).ConfigureAwait(false);
++            }
++
++            var remaining = deadline - DateTime.UtcNow;
++
++            if (!await InFlight.WaitAsync(remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero).ConfigureAwait(false))
++            {
++                Interlocked.Increment(ref dropped);
++                return false;
++            }
++
++            try
++            {
++                await connect().ConfigureAwait(false);
++                return true;
++            }
++            finally
++            {
++                InFlight.Release();
++            }
++        }
++
++        private static int Read(string name, int fallback)
++            => int.TryParse(Environment.GetEnvironmentVariable(name), out var value) && value >= 0 ? value : fallback;
++    }
++}
+diff --git a/sockseek/Sockseek.Core/Sockseek.Core.csproj b/sockseek/Sockseek.Core/Sockseek.Core.csproj
+index 7f7631a..2b2b603 100644
+--- a/sockseek/Sockseek.Core/Sockseek.Core.csproj
++++ b/sockseek/Sockseek.Core/Sockseek.Core.csproj
+@@ -27,7 +27,8 @@
+     <!-- Upstream 10.0.2 is unlisted/deprecated for CriticalBugs, with no newer release.
+          Review https://github.com/jpdillingham/Soulseek.NET/releases before upgrading;
+          retain the search-disposal workaround until an upstream fix is verified. -->
+-    <PackageReference Include="Soulseek" Version="10.0.2" />
++    <!-- Modified 2026-10-21 by Bllly Shears for NAPIA: a modified copy of Soulseek.NET 10.0.2 (connection throttle) instead of the NuGet package. -->
++    <ProjectReference Include="../../Soulseek.NET/src/Soulseek.csproj" />
+     <PackageReference Include="SpotifyAPI.Web" Version="7.4.2" />
+     <PackageReference Include="SpotifyAPI.Web.Auth" Version="7.4.2" />
+     <PackageReference Include="TagLibSharp" Version="2.3.0" />
+diff --git a/sockseek/Sockseek.Core/Soulseek/SoulseekClientManager.cs b/sockseek/Sockseek.Core/Soulseek/SoulseekClientManager.cs
+index f85eaa3..9e8c12d 100644
+--- a/sockseek/Sockseek.Core/Soulseek/SoulseekClientManager.cs
++++ b/sockseek/Sockseek.Core/Soulseek/SoulseekClientManager.cs
+@@ -1,3 +1,5 @@
++// Modified 2026-10-21 by Bllly Shears for NAPIA ("sockseek con freno"): this modified build uses its own
++// Soulseek client minor version (826102100) so it does not identify itself as the official sockseek.
+ using Soulseek;
+ using System.Security.Cryptography;
+ using System.Net.Sockets;
+@@ -9,8 +11,8 @@ namespace Sockseek.Core.Services;
+ public static class SockseekSoulseekClientIdentity
+ {
+     // Soulseek.NET requires each application to use a unique minor version.
+-    // Sockseek uses the 800850000-800859999 range.
+-    public const int MinorVersion = 800850000;
++    // Sockseek uses the 800850000-800859999 range. This modified build (NAPIA, "sockseek con freno") uses 826102100.
++    public const int MinorVersion = 826102100;
+ }
+ 
+ public sealed class SoulseekConnectionUnavailableException : InvalidOperationException

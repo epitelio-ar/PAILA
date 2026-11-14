@@ -1,0 +1,60 @@
+// Los textos de Sonido, una sola historia (Sonido.tsx), en castellano y en inglés.
+import { cant, num, textos } from '@paila/shared/idioma'
+
+export const T = textos({
+  titulo: { es: 'Sonido', en: 'Sound' },
+  sub: { es: 'Lo que suena mal, lo que te falta y lo que llegó, en un solo lugar. NAPIA baja; vos aplicás.', en: "What sounds bad, what you're missing and what arrived, in one place. NAPIA downloads; you apply." },
+  malTitulo: { es: (k: number) => `Suenan mal (${num(k)})`, en: (k: number) => `Sound bad (${num(k)})` },
+  malTip: {
+    es: 'Temas que tenés pero suenan peor de lo que podrían: un MP3 de pocos kbps, un "FLAC" que por dentro es un MP3, uno inflado. PAILA los escuchó todos; acá dice cómo suena cada uno, del que peor suena al que mejor.',
+    en: "Tracks you have that sound worse than they could: a low-kbps MP3, a \"FLAC\" that's really an MP3, an inflated one. PAILA listened to all of them; here it says how each one sounds, from the worst-sounding to the best.",
+  },
+  malNada: { es: 'Nada suena mal: todo está en buena calidad.', en: 'Nothing sounds bad: everything is in good quality.' },
+  mandarMal: { es: (k: number) => `Buscar mejores con NAPIA: ${k === 1 ? 'el que suena mal' : `los ${num(k)} que suenan mal`}`, en: (k: number) => `Find better ones with NAPIA: ${k === 1 ? 'the one that sounds bad' : `the ${num(k)} that sound bad`}` },
+  mandarTip: {
+    es: 'NAPIA empieza a bajar sola, minimizada, del que peor suena al que mejor: el avance se ve acá arriba y, al terminar, queda minimizada. Solo se queda con copias claramente mejores que la tuya; lo trucho lo aparta.',
+    en: 'NAPIA starts downloading on its own, minimized, from the worst-sounding to the best: the progress shows up here at the top and, when it finishes, it stays minimized. It only keeps copies clearly better than yours; fakes are set aside.',
+  },
+  mandando: { es: 'Mandando a NAPIA…', en: 'Sending to NAPIA…' },
+  mandado: { es: (k: number) => `${cant(k, 'tema', 'temas')} para NAPIA: ya está bajando.`, en: (k: number) => `${cant(k, 'track', 'tracks')} for NAPIA: it's already downloading.` },
+  bandeja: { es: ' La Bandeja vigila lo que baja.', en: ' The Inbox watches what it downloads.' },
+  seSuma: { es: 'Se suma a lo que ya está bajando.', en: "It's added to what's already downloading." },
+  faltanTitulo: { es: (k: number) => `Te faltan (${num(k)})`, en: (k: number) => `You're missing (${num(k)})` },
+  faltanTip: {
+    es: 'Los temas de tus listas que no tenés, y los que les faltan a tus discos.',
+    en: "The tracks from your lists that you don't have, and the ones missing from your albums.",
+  },
+  faltanNada: { es: 'No te falta nada de tus listas.', en: "You're not missing anything from your lists." },
+  mandarFaltan: { es: (k: number) => `Buscar con NAPIA: ${k === 1 ? 'el que te falta' : `los ${num(k)} que te faltan`}`, en: (k: number) => `Find with NAPIA: ${k === 1 ? "the one you're missing" : `the ${num(k)} you're missing`}` },
+  verTodos: { es: (k: string) => `Ver los ${k}`, en: (k: string) => `See all ${k}` },
+  llegaronTitulo: { es: 'Llegaron', en: 'Arrived' },
+  llegaronTip: {
+    es: 'Lo que bajó NAPIA (o dejaste en la Bandeja). PAILA lo reconoce por cómo suena, mira si es mejor que el tuyo y, si lo es, lo suma a lo que vas a aplicar. Lo que no es mejor no se toca.',
+    en: "What NAPIA downloaded (or you left in the Inbox). PAILA recognizes it by how it sounds, checks whether it's better than yours and, if so, adds it to what you're going to apply. What isn't better is left alone.",
+  },
+  sinBandeja: { es: 'Todavía no llegó nada. Lo que baje NAPIA aparece acá solo.', en: "Nothing has arrived yet. What NAPIA downloads shows up here on its own." },
+  nadaTodavia: { es: 'Todavía no llegó nada nuevo.', en: 'Nothing new has arrived yet.' },
+  revisando: { es: (k: number) => `Revisando ${cant(k, 'archivo', 'archivos')}…`, en: (k: number) => `Checking ${cant(k, 'file', 'files')}…` },
+  mejoresTexto: {
+    es: (k: number) => `${cant(k, 'copia mejor ya está', 'copias mejores ya están')} en lo que vas a aplicar. Destildá la que no quieras.`,
+    en: (k: number) => `${cant(k, 'better copy is', 'better copies are')} already in what you're going to apply. Untick any you don't want.`,
+  },
+  mejoresTip: {
+    es: 'Al aplicar, tu copia va a la papelera de PAILA y la nueva toma su lugar con tus tags, tu tapa y tu nombre (cambia solo la extensión); sigue en todas tus playlists. Se deshace desde el Historial.',
+    en: "When you apply, your copy goes to PAILA's Trash and the new one takes its place with your tags, cover and name (only the extension changes); it stays in all your playlists. You can undo it from History.",
+  },
+  aplicar: { es: (k: number) => `Aplicar ${cant(k, 'copia mejor', 'copias mejores')}`, en: (k: number) => `Apply ${cant(k, 'better copy', 'better copies')}` },
+  aplicarPreg: { es: (k: number) => `¿Cambiar ${cant(k, 'tema', 'temas')} por la copia mejor que llegó?`, en: (k: number) => `Swap ${cant(k, 'track', 'tracks')} for the better copy that arrived?` },
+  siAplicar: { es: 'Sí, aplicar', en: 'Yes, apply' },
+  nuevos: { es: (k: number) => `${cant(k, 'tema que no tenías llegó', 'temas que no tenías llegaron')}.`, en: (k: number) => `${cant(k, 'track you were missing', 'tracks you were missing')} arrived.` },
+  pasar: { es: 'Pasar a tu Música', en: 'Move to your Music' },
+  otros: { es: (k: number) => `${cant(k, 'no sirvió o hay que mirarlo', 'no sirvieron o hay que mirarlos')}`, en: (k: number) => `${cant(k, "didn't qualify or needs a look", "didn't qualify or need a look")}` },
+  verBandeja: { es: 'Ver en la Bandeja', en: 'See in the Inbox' },
+  arreglosTitulo: { es: 'Arreglos de sonido', en: 'Sound fixes' },
+  arreglosTip: { es: 'Arreglos que no cambian de copia: se proponen, los aplicás y se deshacen como todo.', en: "Fixes that don't change the copy: they're proposed, you apply them and they can be undone like everything else." },
+  volumen: { es: 'Volumen parejo', en: 'Even volume' },
+  volumenTexto: { es: 'Que todos suenen igual de fuerte (solo un dato en el tag).', en: 'So all of them play equally loud (just a value in the tag).' },
+  silencios: { es: 'Recortar silencios', en: 'Trim silences' },
+  silenciosTexto: { es: 'Que no tarden en arrancar ni queden callados al final.', en: "So they don't take long to start or stay silent at the end." },
+  todoBien: { es: 'Todo suena bien y no te falta nada.', en: "Everything sounds good and you're not missing anything." },
+})

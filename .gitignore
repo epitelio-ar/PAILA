@@ -1,0 +1,36 @@
+node_modules/
+out/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+.claude/
+coverage/
+*.tsbuildinfo
+# claves de aplicación (Discogs, AcoustID): nunca al repositorio
+claves.local.json
+
+# el sockseek con freno de NAPIA (~116 MB): lo deja ahí `npm run sockseek:freno`
+apps/napia/recursos/sockseek/*.exe
+
+# Beat This! para el instalador (~220 MB): lo deja ahí `npm run modelos:armar`
+apps/paila/recursos/modelos/
+
+# capturas de todas las pantallas (npm run capturas)
+capturas/
+!/docs/capturas/
+
+# mpv para la salida "bit perfect" (~120 MB): lo deja ahí `npm run mpv:bajar`
+apps/paila/recursos/mpv/*.exe
+
+# ffprobe de gyan.dev 6.1.1 (~83 MB): lo deja ahí `npm run ffprobe:bajar`
+apps/paila/recursos/ffprobe/
+
+# PAILA para Mac: mpv.app y el sockseek con freno de cada procesador (los deja ahí el armado para Mac)
+apps/paila/recursos/mpv-mac/
+apps/napia/recursos/sockseek-mac/
+
+# lo que deja el armado de una versión (version.yml, o sus mismos pasos en la PC)
+/salida/
+/codigo-fuente/
+/capturas-win/

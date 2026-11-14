@@ -1,0 +1,52 @@
+{
+  "name": "paila-familia",
+  "description": "La familia PAILA en un solo repositorio: PAILA (apps/paila), NAPIA (apps/napia) y lo que comparten (packages/).",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w paila",
+    "dev:napia": "npm run dev -w napia",
+    "build": "npm run build -w napia && npm run build -w paila",
+    "start": "npm run start -w paila",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test",
+    "verificar": "node scripts/verificar.mjs",
+    "dist": "node scripts/preparar-instalador.mjs && npm run build -w napia && npm run dist -w paila",
+    "pack": "node scripts/preparar-instalador.mjs && npm run build -w napia && npm run pack -w paila",
+    "dist:mac": "npm run build && node scripts/armar-mac.mjs",
+    "corpus": "node scripts/run-ts.mjs scripts/corpus.ts",
+    "version:subir": "node scripts/subir-version.mjs",
+    "licencias": "node scripts/run-ts.mjs scripts/licencias.ts",
+    "sockseek:freno": "node scripts/sockseek-freno.mjs",
+    "captura": "node scripts/captura.mjs",
+    "capturas": "node scripts/run-ts.mjs scripts/capturas.ts",
+    "capturas:comparar": "node scripts/run-ts.mjs scripts/capturas-comparar.ts",
+    "tema": "node scripts/run-ts.mjs scripts/tema.ts",
+    "prueba": "node scripts/run-ts.mjs scripts/prueba-personas.ts",
+    "prueba:informe": "node scripts/run-ts.mjs scripts/prueba-informe.ts",
+    "textos": "node scripts/run-ts.mjs scripts/textos.ts",
+    "turnos": "node scripts/turnos.mjs",
+    "modelos:armar": "node scripts/modelos-beat-this.mjs",
+    "mpv:bajar": "node scripts/mpv-bajar.mjs",
+    "ffprobe:bajar": "node scripts/ffprobe-bajar.mjs",
+    "mpv:mac": "node scripts/mpv-mac.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.12"
+  },
+  "allowScripts": {
+    "ffmpeg-static@5.3.0": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}

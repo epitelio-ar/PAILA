@@ -1,0 +1,41 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+.etapas { display: flex; flex-direction: column; gap: 12px; max-width: 900px; }
+.et { display: grid; grid-template-columns: 46px 1fr auto; gap: 16px; align-items: center; padding: 16px 20px; }
+.et .num { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font: 20px Anton; border: 2px solid #3a424c; color: #8e97a3; }
+.et.ok .num { background: #46c06e; border-color: #46c06e; color: #0b1a10; }
+.et.rep .num { background: #f5d84a; border-color: #f5d84a; color: #1a1600; }
+.et.ahora { border: 2px solid #ff9a3c; background: #1b1a17; }
+.et.ahora .num { background: #ff9a3c; border-color: #ff9a3c; color: #121212; }
+.et.luego { opacity: .55; }
+.et b { font-size: 18px; } .et .q { color: #8e97a3; font-size: 14px; margin-top: 2px; }
+.rep-aviso { color: #f5d84a; font-size: 14px; margin-top: 4px; }
+</style></head><body>
+<div class="etiqueta">A · EL CAMINO</div>
+<aside class="side">
+  <div class="logo">PAILA</div>
+  <div class="si on">⌂ Tu camino</div>
+  <div class="si">▷ Escuchando</div>
+  <div class="grupo">Etapas</div>
+  <div class="si"><span class="n ok">✓</span>Conocer tu música</div>
+  <div class="si"><span class="n ok">✓</span>Limpiar</div>
+  <div class="si"><span class="n rep">!</span>Nombres y datos</div>
+  <div class="si"><span class="n">4</span>Ordenar carpetas</div>
+  <div class="si"><span class="n">5</span>Mejorar el sonido</div>
+  <div class="grupo">Usar tu música</div>
+  <div class="si">♫ Listas</div>
+  <div class="si">⇪ Llevar (pendrive, celu)</div>
+  <div class="grupo">Herramientas ▸</div>
+  <div class="si muted small">26 pantallas, plegadas</div>
+</aside>
+<main class="main">
+  <h1>Tu camino</h1>
+  <p class="sub">Siempre en este orden. PAILA te dice qué sigue y qué quedó para repasar.</p>
+  <div class="etapas">
+    <div class="card et ok"><div class="num">✓</div><div><b>Conocer tu música</b><div class="q">4.000 temas analizados · 60 GB · nota promedio B</div></div><span class="pill p-ok">Listo</span></div>
+    <div class="card et ok"><div class="num">✓</div><div><b>Limpiar</b><div class="q">30 repetidos a la papelera · no queda ninguno sin revisar</div></div><span class="pill p-ok">Listo</span></div>
+    <div class="card et ahora rep"><div class="num">3</div><div><b>Nombres y datos</b><div class="q">Nombres, lo que falta de internet y las tapas de los discos, en una sola revisión</div>
+      <div class="rep-aviso">⟲ Para repasar: llegaron 48 temas nuevos desde la Bandeja</div></div><span class="btn big">Revisar 48 temas</span></div>
+    <div class="card et luego"><div class="num">4</div><div><b>Ordenar carpetas</b><div class="q">Va después de los nombres: así cada tema cae en su carpeta una sola vez</div></div><span class="pill p-off">Después</span></div>
+    <div class="card et luego"><div class="num">5</div><div><b>Mejorar el sonido</b><div class="q">1.000 temas suenan mal o son truchos · NAPIA busca copias mejores</div></div><span class="pill p-off">Después</span></div>
+  </div>
+</main></body></html>

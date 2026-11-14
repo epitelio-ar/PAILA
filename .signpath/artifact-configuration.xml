@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Configuraciones de artefacto para SignPath (Fase H). No las lee GitHub: se copian en el proyecto PAILA de SignPath
+  (Project → Artifact configurations), una por slug, cuando SignPath Foundation apruebe el proyecto. Las usa
+  .github/workflows/version.yml. Solo se firma lo que es de PAILA: nunca ffmpeg.exe ni ffprobe.exe (son de FFmpeg).
+-->
+<configuraciones>
+  <!-- slug "programa": el zip de la carpeta win-unpacked; se firma solo PAILA.exe -->
+  <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+    <zip-file>
+      <pe-file path="PAILA.exe">
+        <authenticode-sign />
+      </pe-file>
+    </zip-file>
+  </artifact-configuration>
+
+  <!-- slug "instaladores": el zip con el instalador y la portable -->
+  <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+    <zip-file>
+      <pe-file path="PAILA-instalador-*.exe">
+        <authenticode-sign />
+      </pe-file>
+      <pe-file path="PAILA-portable-*.exe">
+        <authenticode-sign />
+      </pe-file>
+    </zip-file>
+  </artifact-configuration>
+</configuraciones>

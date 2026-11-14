@@ -1,0 +1,37 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+.top { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
+.prog { flex: 1; display: flex; gap: 6px; align-items: center; font-size: 13px; color: #8e97a3; }
+.prog span { padding: 4px 10px; border-radius: 999px; background: #1f2429; }
+.prog span.ok { background: rgba(70,192,110,.16); color: #46c06e; }
+.prog span.va { background: rgba(255,154,60,.18); color: #ff9a3c; font-weight: 700; }
+.grupos { display: flex; flex-direction: column; gap: 10px; }
+.g { display: grid; grid-template-columns: 26px 1fr auto auto; gap: 14px; align-items: center; padding: 14px 18px; }
+.g input { width: 20px; height: 20px; accent-color: #ff9a3c; }
+.g b { font-size: 17px; } .g .ej { color: #8e97a3; font-size: 13px; margin-top: 3px; font-family: Consolas, monospace; }
+.g .abrir { color: #6aa4ff; font-size: 14px; }
+.pie { position: fixed; left: 240px; right: 0; bottom: 0; padding: 16px 40px; background: #15181c; border-top: 1px solid #272c33; display: flex; align-items: center; gap: 18px; }
+.orden { color: #8e97a3; font-size: 13px; }
+</style></head><body>
+<div class="etiqueta">B · UNA SOLA REVISIÓN</div>
+<aside class="side">
+  <div class="logo">PAILA</div>
+  <div class="si">⌂ Inicio</div>
+  <div class="si on">✦ Ordenar tu música</div>
+  <div class="si">♪ Mejorar el sonido</div>
+  <div class="si">♫ Usar tu música</div>
+  <div class="grupo">Herramientas ▸</div>
+  <div class="si muted small">plegadas, para quien sabe</div>
+</aside>
+<main class="main">
+  <h1>Ordenar tu música</h1>
+  <p class="sub">PAILA miró todo en el orden correcto. Revisá lo que propone, sacá lo que no quieras y aplicá una sola vez.</p>
+  <div class="top"><div class="prog"><span class="ok">✓ Analizar</span>→<span class="ok">✓ Repetidos</span>→<span class="ok">✓ Internet</span>→<span class="ok">✓ Nombres</span>→<span class="ok">✓ Carpetas</span></div></div>
+  <div class="grupos">
+    <label class="card g"><input type="checkbox" checked><div><b>30 repetidos a la papelera</b><div class="ej">se queda la copia con mejor nota · ej. "Ruta 40 (1).mp3" (D) → queda "Ruta 40.flac" (A)</div></div><span class="pill p-info">se puede deshacer</span><span class="abrir">Ver los 30 ›</span></label>
+    <label class="card g"><input type="checkbox" checked><div><b>212 nombres arreglados</b><div class="ej">"02 - ysy a - pastel con nutella" → YSY A — Pastel con Nutella</div></div><span class="pill p-at">18 con dudas</span><span class="abrir">Ver los 212 ›</span></label>
+    <label class="card g"><input type="checkbox" checked><div><b>140 temas con disco, año y género de internet</b><div class="ej">La Renga — Arte infernal → disco "Insoportablemente vivo", 2001, Rock</div></div><span class="pill p-info">MusicBrainz</span><span class="abrir">Ver los 140 ›</span></label>
+    <label class="card g"><input type="checkbox" checked><div><b>14 discos con su tapa</b><div class="ej">Guns N' Roses — Greatest Hits · 12 temas</div></div><span></span><span class="abrir">Ver las 14 ›</span></label>
+    <label class="card g"><input type="checkbox" checked><div><b>265 temas a su carpeta</b><div class="ej">Artista / Año - Disco / 01 - Tema   (con los nombres de arriba ya arreglados)</div></div><span class="pill p-off">cambiar la regla</span><span class="abrir">Ver las carpetas ›</span></label>
+  </div>
+  <div class="pie"><span class="btn ok big">Aplicar todo (661 cambios)</span><span class="orden">Se aplica en el orden que no rompe nada: papelera → nombres y datos → tapas → carpetas. Todo se deshace desde el Historial.</span></div>
+</main></body></html>

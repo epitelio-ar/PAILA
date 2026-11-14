@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "Problema de seguridad · Security problem"
+    url: https://github.com/epitelio-ar/PAILA/security/advisories/new
+    about: "En privado, nunca en un issue público · Privately, never in a public issue"

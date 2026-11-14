@@ -1,0 +1,58 @@
+name: "Algo anda mal · Something's wrong"
+description: "Un error, algo que se cuelga o un resultado raro · A bug, a freeze or a weird result"
+labels: ["error"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar. Podés escribir en castellano o en inglés. · Thanks for reporting. You can write in Spanish or English.
+        **¿Es de seguridad? No lo pongas acá:** seguí [SECURITY.md](https://github.com/epitelio-ar/PAILA/blob/main/SECURITY.md). · **Is it about security? Don't post it here:** follow SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: "Versión de PAILA · PAILA version"
+      description: "Configuración → Actualizaciones · Settings → Updates"
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: sistema
+    attributes:
+      label: "Sistema · System"
+      options: ["Windows 11", "Windows 10", "Mac (en prueba · being tested)", "Otro · Other"]
+    validations:
+      required: true
+  - type: dropdown
+    id: programa
+    attributes:
+      label: "¿En qué programa? · Which program?"
+      options: ["PAILA", "NAPIA", "El instalador · The installer"]
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: "Qué hiciste · What you did"
+      description: "Los pasos para que vuelva a pasar, si los sabés · Steps to make it happen again, if you know them"
+      placeholder: "1. Abrí Duplicados · Opened Duplicates\n2. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: "Qué esperabas y qué pasó · What you expected and what happened"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: "Capturas o diagnóstico · Screenshots or diagnostic"
+      description: |
+        Si podés, sumá el zip de **Configuración → Si algo anda mal → Exportar diagnóstico** (no lleva tu música ni nombres de temas o carpetas; te muestra todo antes de guardarlo). Ojo con las capturas: pueden mostrar tu biblioteca.
+        If you can, attach the zip from **Settings → If something goes wrong → Export diagnostic** (it doesn't include your music or track/folder names; it shows you everything before saving). Careful with screenshots: they may show your library.
+  - type: checkboxes
+    id: archivos
+    attributes:
+      label: "Tus archivos · Your files"
+      options:
+        - label: "¿Algún archivo quedó cambiado, movido o falta? (si pasó, contalo arriba y no toques más nada hasta que lo veamos) · Was any file changed, moved or missing? (if so, say it above and don't touch anything else until we look at it)"

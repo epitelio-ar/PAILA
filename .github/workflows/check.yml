@@ -1,0 +1,71 @@
+# Revisión automática de cada cambio (MASTERPLAN-2, Fase O): tipos, tests, armado y dependencias con avisos de seguridad.
+# Corre en Windows, como la app. Los tests que necesitan la biblioteca real (PAILA_LIBRARY) o el laboratorio
+# (PAILA_CORPUS, npm run corpus) no corren acá: se saltean solos.
+# Corre en los pedidos de cambio, una vez por semana y a mano; antes de unir, `npm run verificar` revisa lo mismo en la PC.
+name: Revisión
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1' # lunes 06:00 en Argentina
+
+permissions:
+  contents: read
+
+concurrency:
+  group: revision-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    name: Tipos, tests y armado
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      # npm solo corre los scripts de instalación aprobados en "allowScripts" (package.json);
+      # Electron baja su programa aparte.
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npx install-electron
+
+      - name: Tipos
+        run: npx tsc --noEmit -p tsconfig.json
+
+      # el ffprobe que viaja con PAILA (gyan.dev 6.1.1, revisado con su huella): sin él, los tests usarían el viejo de ffprobe-static
+      - name: ffprobe
+        run: npm run ffprobe:bajar
+
+      - name: Tests (incluye la regla de estilo, tests/estilo.test.ts)
+        run: npm test
+
+      - name: Armado (electron-vite, dentro de apps/paila)
+        run: npm run build
+
+  dependencias:
+    name: Dependencias (OSV-Scanner)
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      # Versión fija y verificada por su huella SHA-256 (la publica Google junto con cada versión).
+      - name: Bajar OSV-Scanner v2.6.0
+        shell: pwsh
+        run: |
+          $url = 'https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_windows_amd64.exe'
+          Invoke-WebRequest -Uri $url -OutFile osv-scanner.exe
+          $hash = (Get-FileHash osv-scanner.exe -Algorithm SHA256).Hash.ToLower()
+          if ($hash -ne 'e0ed7644118b717b028c249ee9d3515024e55e8510747ca08906eb96765354d6') { throw "La huella de osv-scanner.exe no coincide: $hash" }
+
+      - name: Revisar package-lock.json
+        shell: pwsh
+        run: ./osv-scanner.exe scan source --lockfile=package-lock.json

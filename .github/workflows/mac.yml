@@ -1,0 +1,175 @@
+# PAILA para Mac, en prueba (MASTERPLAN-4, 4A.2): en una Mac de GitHub corre tipos y tests, y arma los dos .dmg (Apple
+# Silicon e Intel), sin la firma de Apple. Abre la app armada y le saca una captura, para ver que arranca.
+# Lo llama también el armado de una versión (version.yml), y sus .dmg van al borrador de GitHub Releases.
+# Corre solo a mano (Actions → "PAILA para Mac" → Run workflow) o subiendo a propósito una rama mac/<algo>, nunca en cada
+# cambio a main (es la más larga).
+# Un commit con "[sin armar]" en el mensaje corre solo tipos y tests (unos 4 minutos en vez de 10).
+name: PAILA para Mac
+
+on:
+  workflow_dispatch:
+    inputs:
+      armar:
+        description: 'Armar los .dmg (si no, solo tipos y tests)'
+        type: boolean
+        default: true
+  # el armado de una versión (version.yml) lo llama para los .dmg que van al borrador
+  workflow_call:
+    inputs:
+      armar:
+        type: boolean
+        default: true
+  # una rama de prueba subida como mac/<algo> (git push origin HEAD:mac/prueba): así se prueba sin tocar main
+  push:
+    branches: ['mac/**']
+    paths:
+      - '.github/workflows/mac.yml'
+      - 'scripts/armar-mac.mjs'
+      - 'scripts/mpv-mac.mjs'
+      - 'apps/napia/sockseek-freno/**'
+      - 'packages/core/volumes-mac.ts'
+      - 'packages/shared/menumac.ts'
+      - 'apps/paila/package.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-${{ github.workflow }}-${{ github.ref }}  # llamado desde version.yml, github.workflow es el de ella: no se cancelan entre sí
+  cancel-in-progress: true
+
+jobs:
+  mac:
+    name: Tipos, tests y .dmg en Mac
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      # un commit con "[sin armar]" en el mensaje corre solo tipos y tests (ahorra unos 5 minutos de Mac)
+      ARMAR: ${{ (github.event_name == 'push' && !contains(github.event.head_commit.message, '[sin armar]')) || inputs.armar }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: |
+          echo "INICIO=$(date +%s)" >> "$GITHUB_ENV"
+          npm ci
+          npx install-electron
+
+      - name: Tipos
+        run: npx tsc --noEmit -p tsconfig.json
+
+      # mpv de verdad para los tests de la salida bit perfect (con la salida nula: no suena nada)
+      - name: mpv para Mac
+        if: ${{ !cancelled() }}
+        run: |
+          node scripts/mpv-mac.mjs arm64
+          echo "PAILA_MPV=$PWD/apps/paila/recursos/mpv-mac/arm64/mpv.app/Contents/MacOS/mpv" >> "$GITHUB_ENV"
+
+      # aunque algo de arriba falle, los tests corren igual (sin mpv, sus tests de verdad se saltean solos)
+      - name: Tests (incluye la regla de estilo)
+        if: ${{ !cancelled() }}
+        run: npm test
+
+
+      # lo que tarda en conseguirse (el modelo, sockseek armado) queda guardado entre corridas, aunque la corrida falle
+      - name: Beat This! (guardado entre corridas)
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        id: modelos
+        uses: actions/cache/restore@v4
+        with:
+          path: apps/paila/recursos/modelos
+          key: beat-this-25308706-ort-1.30.0
+
+      - name: Bajar Beat This! si no estaba guardado
+        if: ${{ !cancelled() && env.ARMAR == 'true' && steps.modelos.outputs.cache-hit != 'true' }}
+        run: node scripts/modelos-beat-this.mjs --bajar
+
+      - name: Guardar Beat This! para la próxima
+        if: ${{ !cancelled() && env.ARMAR == 'true' && steps.modelos.outputs.cache-hit != 'true' && hashFiles('apps/paila/recursos/modelos/beat-this/beat_this.onnx') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: apps/paila/recursos/modelos
+          key: beat-this-25308706-ort-1.30.0
+
+      - name: sockseek con freno para Mac (guardado entre corridas)
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        id: sockseek
+        uses: actions/cache/restore@v4
+        with:
+          path: apps/napia/recursos/sockseek-mac
+          key: sockseek-mac-${{ hashFiles('apps/napia/sockseek-freno/freno.patch', 'apps/napia/sockseek-freno/armar.sh') }}
+
+      - name: .NET 10 (para armar sockseek)
+        if: ${{ !cancelled() && env.ARMAR == 'true' && steps.sockseek.outputs.cache-hit != 'true' }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Armar sockseek con freno (Apple Silicon e Intel)
+        if: ${{ !cancelled() && env.ARMAR == 'true' && steps.sockseek.outputs.cache-hit != 'true' }}
+        run: |
+          bash apps/napia/sockseek-freno/armar.sh osx-arm64 apps/napia/recursos/sockseek-mac/arm64 "$RUNNER_TEMP/ss-arm64"
+          bash apps/napia/sockseek-freno/armar.sh osx-x64 apps/napia/recursos/sockseek-mac/x64 "$RUNNER_TEMP/ss-x64"
+
+      - name: Guardar sockseek para la próxima
+        if: ${{ !cancelled() && env.ARMAR == 'true' && steps.sockseek.outputs.cache-hit != 'true' && hashFiles('apps/napia/recursos/sockseek-mac/arm64/sockseek') != '' && hashFiles('apps/napia/recursos/sockseek-mac/x64/sockseek') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: apps/napia/recursos/sockseek-mac
+          key: sockseek-mac-${{ hashFiles('apps/napia/sockseek-freno/freno.patch', 'apps/napia/sockseek-freno/armar.sh') }}
+
+      - name: Armar los .dmg
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        run: npm run dist:mac
+
+      # ¿Arranca? Lo que viaja adentro anda y la ventana se dibuja (captura con la ventana oculta, datos en una carpeta vacía).
+      - name: Probar la app armada
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        run: |
+          A=apps/paila/dist/mac-arm64/PAILA.app
+          R=$A/Contents/Resources
+          mkdir -p capturas-mac
+          codesign -dv "$A" 2>&1 | grep -E 'Signature|Format' || true
+          "$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1
+          "$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/arm64/ffprobe" -hide_banner -version | head -1
+          "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | head -1
+          "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --ao=coreaudio_exclusive --audio-device=help || true
+          "$R/napia/recursos/sockseek/sockseek" --version
+          ls "$R/modelos/beat-this" "$R/AVISOS-DE-TERCEROS.txt"
+          # el de Intel: que cada programa sea de ese procesador (y sus versiones, si la Mac tiene Rosetta)
+          X=apps/paila/dist/mac/PAILA.app/Contents/Resources
+          for f in "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" "$X/mpv/mpv.app/Contents/MacOS/mpv" "$X/napia/recursos/sockseek/sockseek" apps/paila/dist/mac/PAILA.app/Contents/MacOS/PAILA; do echo "$(lipo -archs "$f") $f"; done
+          arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1 || true
+          arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | head -1 || true
+          # con tope de 2 minutos cada una (perl: macOS no trae `timeout`)
+          tope() { perl -e 'alarm shift; exec @ARGV' 120 "$@"; }
+          PAILA_USER_DATA="$RUNNER_TEMP/datos-paila" PAILA_SNAPSHOT="$PWD/capturas-mac/paila.png" tope "$A/Contents/MacOS/PAILA" || true
+          NAPIA_USER_DATA="$RUNNER_TEMP/datos-napia" NAPIA_SNAPSHOT="$PWD/capturas-mac/napia.png" tope "$A/Contents/MacOS/PAILA" --napia || true
+          ls -la capturas-mac apps/paila/dist/*.dmg
+
+      - name: Guardar los .dmg
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: PAILA-mac-sin-firmar
+          path: apps/paila/dist/*.dmg
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Guardar las capturas
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-mac
+          path: capturas-mac
+          retention-days: 3
+
+      - name: Minutos de Mac de esta corrida
+        if: always()
+        run: echo "Minutos de Mac (aprox.) $(( ($(date +%s) - ${INICIO:-$(date +%s)}) / 60 + 1 ))" | tee -a "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,302 @@
+/* Salto estético (22/10, docs/archivo/diseno/salto-mezcla.md): el marco de la ventana con la identidad de las figuritas.
+   Logo de plaqueta, barra lateral angosta tipo consola, el reproductor de abajo para escuchar en serio y la pantalla Escuchando. */
+
+/* ---------- logo ---------- */
+.brand { letter-spacing: 0; }
+.brand img { width: 34px; height: 34px; border-radius: 0; transform: rotate(-5deg); filter: drop-shadow(2px 2px 0 #000); }
+.brand-name { font: 28px/1 var(--font-titulo); color: var(--acento); letter-spacing: .04em; -webkit-text-stroke: 1px #000; paint-order: stroke fill; text-shadow: 2px 2px 0 #000; }
+
+/* ---------- barra lateral: rótulos angostos y el elegido con barra de acento ---------- */
+.side-group-title { font-family: var(--font-rotulo); font-stretch: 75%; font-weight: 600; font-size: 10.5px; letter-spacing: .14em; }
+.side-item { border-radius: var(--r-sm); min-height: 25px; }
+.side-item.on { background: var(--accent-soft); color: #fff; }
+.count { font-family: var(--font-mono); font-size: 11px; }
+
+/* ---------- reproductor de abajo ---------- */
+.app { grid-template-rows: 54px 46px minmax(0, 1fr) 80px 26px; }
+.player { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(320px, 1.7fr) minmax(min-content, 1fr); gap: var(--sp-5); background: linear-gradient(#15171c, #0f1013); border-top: 1px solid var(--borde-fuerte); }
+.player-tema { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.player-tema.abre { cursor: pointer; border-radius: 6px; }
+.player-tema.abre:hover b { text-decoration: underline; }
+.player-cover { width: 54px; height: 54px; border-radius: 4px; box-shadow: 0 0 0 2px #000, 0 0 0 4px var(--acento), 3px 3px 0 4px #000; }
+.player-cover.vacia { box-shadow: 0 0 0 1px var(--borde); }
+.player-info { display: flex; flex-direction: column; min-width: 0; width: auto; flex: 1; line-height: 1.3; }
+.player-info b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player-info > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-sm); }
+.player-centro { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; }
+.player-ctl { justify-content: center; gap: 14px; }
+.play { width: 38px; height: 38px; background: var(--crema); color: #111; box-shadow: 2px 2px 0 #000; }
+.play:hover:not(:disabled) { background: #fff; }
+.player-linea { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 10px; }
+.player-linea .time { width: auto; font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+.player-linea .time:first-child { text-align: right; }
+.player-der { display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0; }
+.pil { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border: 1px solid var(--borde-fuerte); border-radius: 13px; font-size: 11.5px; color: var(--muted); white-space: nowrap; flex: none; }
+.pil .grade { font-size: 12px; line-height: 15px; min-width: 20px; padding: 0 4px; }
+.pil b { font-weight: 700; }
+.volume { width: 80px; flex: none; }
+
+/* ---------- la forma de onda como barra de avance ---------- */
+.onda { position: relative; height: 28px; min-width: 0; }
+.onda-fondo, .onda-hecho { position: absolute; inset: 0; -webkit-mask: var(--onda) center / 100% 100% no-repeat; mask: var(--onda) center / 100% 100% no-repeat; }
+.onda-fondo { background: #4a505b; }
+.onda-hecho { background: var(--acento); clip-path: inset(0 calc(100% - var(--avance)) 0 0); }
+.sin-onda .onda-fondo, .sin-onda .onda-hecho { -webkit-mask: none; mask: none; top: calc(50% - 2px); bottom: auto; height: 4px; border-radius: 2px; }
+.onda-cabezal { position: absolute; top: -3px; bottom: -3px; left: var(--avance); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 6px rgba(255, 255, 255, .7); pointer-events: none; }
+.onda-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.onda-input:disabled { cursor: default; }
+.onda:has(.onda-input:focus-visible) { outline: 2px solid var(--acento); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- pantalla Escuchando: el reproductor en grande, encima de la zona central ---------- */
+/* debajo de la barra de pestañas (la tapaba: se veían solo «Tu música» y «Conocer») */
+.escuchando { position: fixed; top: calc(54px + 46px); left: var(--side-w); right: 0; bottom: calc(80px + 26px); z-index: 20; display: grid; grid-template-columns: minmax(0, 1fr) 380px; background: var(--fondo); overflow: hidden; }
+.esc-fondo { position: absolute; inset: -120px; background: center / cover; filter: blur(90px) saturate(1.3) brightness(.4); }
+.esc-fondo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--fondo) 85%); }
+.esc-principal { position: relative; display: flex; flex-direction: column; justify-content: center; gap: clamp(12px, 2.4vh, 24px); padding: var(--sp-5) 48px; min-width: 0; overflow: auto; }
+.esc-arriba { display: grid; grid-template-columns: min(34vh, 360px) minmax(0, 1fr); gap: 44px; align-items: end; }
+.esc-figu { transform: rotate(-1.5deg); }
+.esc-figu.tocable { display: block; transition: transform .15s; } .esc-figu.tocable:hover { text-decoration: none; transform: rotate(-1.5deg) translateY(-3px); }
+.esc-titulo.tocable { width: 100%; text-align: left; }
+.esc-datos { min-width: 0; padding-bottom: 10px; }
+.esc-datos .rotulo { color: var(--crema); }
+.esc-titulo { font-size: clamp(34px, 4.4vw, 68px); line-height: .98; margin: 12px 0 10px; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.esc-titulo.largo { font-size: clamp(30px, 3.3vw, 50px); }
+.esc-titulo.muy-largo { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.02; }
+.esc-artista { font-size: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.esc-pils { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.esc-pils .pil { height: 30px; font-size: 13px; }
+.onda-grande { height: clamp(60px, 11vh, 110px); }
+.esc-tiempos { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-top: 8px; }
+.esc-ctl { gap: 34px; }
+.esc-ctl .play { width: 64px; height: 64px; box-shadow: 4px 4px 0 #000; }
+.esc-ctl .pbtn { width: 44px; height: 44px; }
+.esc-acciones { display: flex; justify-content: center; align-items: center; gap: var(--sp-3); }
+.esc-acciones .volume { width: 140px; }
+.esc-vacio { text-align: center; }
+.esc-vacio .titulo { font-size: 40px; margin-bottom: var(--sp-2); }
+.esc-cola { position: relative; background: var(--superficie); border-left: 1px solid var(--borde); overflow: auto; }
+.pq-inline { padding: var(--sp-4); }
+.pq-inline h4 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; margin: var(--sp-4) 0 var(--sp-2); display: flex; align-items: center; gap: var(--sp-2); }
+.pq-inline h4:first-of-type { margin-top: 0; }
+.pq-inline .pq-row { padding: 7px 8px; }
+.app.with-detail .escuchando { right: 0; }
+
+/* ---------- modo cabina: todo un poco más grande ---------- */
+[data-cabina] .app { grid-template-rows: 54px 50px minmax(0, 1fr) 96px 26px; }
+[data-cabina] .escuchando { top: calc(54px + 50px); bottom: calc(96px + 26px); }
+[data-cabina] .player-info b { font: 24px/1.05 var(--font-titulo); letter-spacing: .02em; }
+[data-cabina] .player-cover { width: 68px; height: 68px; }
+[data-cabina] .onda { height: 36px; }
+[data-cabina] .onda-grande { height: 130px; }
+[data-cabina] .pil { height: 32px; font-size: 15px; }
+[data-cabina] .player-linea .time { font-size: 14px; }
+
+/* ---------- Inicio: oreja-termómetro, seguir escuchando, playlists y discos con tapa ---------- */
+.inicio { padding: var(--sp-5) var(--sp-6) var(--sp-6); }
+.inicio-arriba { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--sp-4); align-items: stretch; }
+.heroe { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 28px; padding: 18px 26px; border: 1px solid var(--borde); border-radius: 10px;
+  background: radial-gradient(circle at 15% 45%, color-mix(in srgb, var(--acento) 16%, transparent), transparent 55%), var(--superficie); }
+.heroe-oreja img { display: block; height: 210px; max-width: 100%; margin: 0 auto; object-fit: contain; filter: drop-shadow(4px 4px 0 #000); }
+.heroe-txt { min-width: 0; padding-top: 6px; display: flex; flex-direction: column; }
+.heroe-titulo { font-size: 44px; margin-top: 10px; }
+.heroe-peores { display: flex; flex-wrap: wrap; white-space: nowrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--muted); } /* angosto: baja entero, sin partir "Las peores:" */
+.heroe-peores .link { margin-left: 4px; }
+.barra-notas { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; margin: 14px 0 6px; }
+.ley-notas { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.heroe-botones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 16px; }
+.seguir { border: 1px solid var(--borde); border-radius: 10px; background: var(--superficie); padding: 14px 16px; min-width: 0; overflow: hidden; }
+.seguir-cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.seguir-ahora { display: flex; gap: 12px; align-items: center; width: 100%; padding: 0; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; }
+.seguir-tapa { width: 64px; height: 64px; flex: none; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 2px #000, 0 0 0 4px var(--acento); }
+.seguir-ahora .titulo { font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seguir-txt { min-width: 0; display: flex; flex-direction: column; }
+.seguir-txt b, .seguir-txt span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seguir-txt span { font-size: 12px; }
+.seguir-sig { margin: 14px 0 4px; }
+.seguir-fila { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; height: 42px; font-size: 13px; }
+.seguir-mini { width: 34px; height: 34px; border-radius: 3px; overflow: hidden; }
+.tapa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sin-tapa { width: 100%; height: 100%; display: grid; place-items: center; font: 400 clamp(14px, 3vw, 48px) var(--font-titulo); color: rgba(255, 255, 255, .55); }
+.seguir-mini .sin-tapa, .seguir-tapa .sin-tapa { font-size: 14px; }
+/* Para hacer (ParaHacer.tsx): lo que conviene hacer para que PAILA no junte cosas de más; un renglón por cosa, con sus botones */
+.para-hacer { margin-top: var(--sp-4); }
+.para-hacer .box-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.para-hacer-sub { margin: 10px 16px 2px; }
+.para-hacer-lista { list-style: none; margin: 0; padding: 4px 8px 8px; }
+.para-hacer-lista li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 8px; border-top: 1px solid var(--borde); }
+.para-hacer-lista li:first-child { border-top: 0; }
+.para-hacer-lista li.atencion { box-shadow: inset 3px 0 var(--atencion); border-radius: 4px; }
+.para-hacer-lista .ph-ico { color: var(--texto-suave); }
+.para-hacer-lista .ph-texto { min-width: 0; line-height: 1.4; }
+.para-hacer-lista .ph-botones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+/* angosto: los botones bajan debajo del texto */
+@media (max-width: 1100px) { .para-hacer-lista li { grid-template-columns: 18px minmax(0, 1fr); } .para-hacer-lista .ph-botones { grid-column: 2; justify-content: flex-start; } }
+.inicio-h { display: flex; align-items: baseline; gap: 12px; margin: 26px 0 12px; font-weight: 400; }
+.inicio-h .titulo { font-size: 22px; }
+.inicio-h .link { margin-left: auto; }
+.grilla-tapas { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 16px; }
+.grilla-tapas.discos { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 14px; }
+.tarjeta { position: relative; min-width: 0; display: flex; flex-direction: column; }
+.tarjeta b { margin-top: 8px; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tarjeta .small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tarjeta-tapa { position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: var(--superficie-3); box-shadow: 0 8px 20px rgba(0, 0, 0, .5); }
+.tarjeta-tapa .tapa { width: 100%; height: 100%; }
+.tarjeta-tapa:hover { outline: 2px solid var(--acento); outline-offset: 2px; }
+.tarjeta-nota { position: absolute; right: 6px; bottom: 6px; }
+.mosaico { display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 100%; }
+.mosaico img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mosaico .sin-tapa, .mosaico.uno img { grid-column: 1 / -1; grid-row: 1 / -1; }
+.tarjeta-play { position: absolute; right: 8px; top: calc(100% - 64px - 44px); width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--crema); color: #111; display: grid; place-items: center; box-shadow: 2px 2px 0 #000; cursor: pointer; opacity: 0; transition: opacity var(--mov-rapido); }
+.tarjeta:hover .tarjeta-play, .tarjeta-play:focus-visible { opacity: 1; }
+@media (max-width: 1500px) { .grilla-tapas { grid-template-columns: repeat(6, minmax(0, 1fr)); } .grilla-tapas.discos { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+/* el corte cuenta la barra lateral (~236 px): con 1200, a 150 % (1268 de ancho) el título de la oreja se partía en cuatro renglones */
+@media (max-width: 1360px) { .inicio-arriba { grid-template-columns: 1fr; } }
+
+/* ---------- tabla de temas: densa como una consola, con tapita, tono en color y energía en barritas ---------- */
+.th { font-family: var(--font-rotulo); font-stretch: 75%; font-weight: 600; font-size: 10.5px; letter-spacing: .12em; padding: 9px 8px; }
+.thead { background: #101216; border-bottom-color: var(--borde-fuerte); }
+.tr { border-bottom-color: #16191e; }
+.tr:hover { background: var(--hover); }
+.tr.sel { background: #232a36; color: #fff; }
+.td.num { font-family: var(--font-mono); letter-spacing: -.02em; }
+.td-tapa { padding: 0 0 0 6px; overflow: visible; }
+.tapa-fila { width: 100%; aspect-ratio: 1; border-radius: 3px; overflow: hidden; background: var(--superficie-3); }
+.tapa-fila img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tapa-fila span { display: grid; place-items: center; width: 100%; height: 100%; font: 9px var(--font-titulo); color: rgba(255, 255, 255, .6); }
+.dens-comoda .tapa-fila span { font-size: 13px; }
+.camelot { display: inline-block; min-width: 30px; padding: 0 4px; border-radius: 3px; font: 700 11px/16px var(--font-mono); text-align: center; color: #0c0d10; }
+.tono.pend .camelot { opacity: .55; }
+.tono.doubt .camelot { outline: 1px dashed var(--atencion); outline-offset: 1px; }
+.energia { display: inline-flex; gap: 1px; vertical-align: middle; }
+.energia i { width: 3px; height: 10px; background: #2a2f38; }
+.energia i.on { background: #7dd3fc; }
+.energia i.on.alta { background: var(--acento); }
+.fmt { font-family: var(--font-rotulo); font-stretch: 75%; letter-spacing: .06em; background: none; padding: 0; }
+.dens-compacta .td { font-size: 12.5px; }
+.tema .t1 { font-weight: 600; }
+[data-cabina] .camelot { font-size: 15px; line-height: 24px; min-width: 44px; }
+[data-cabina] .energia i { width: 5px; height: 16px; }
+.biblio-cab { display: flex; align-items: baseline; gap: 14px; padding: 14px 16px 10px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
+.biblio-cab .titulo { font-size: 30px; }
+.biblio-cab .muted { font-size: 12.5px; }
+
+/* ---------- ficha del tema (panel de la derecha) ---------- */
+.detail { background: var(--superficie); }
+.detail-body h4 { font-family: var(--font-rotulo); font-stretch: 75%; font-weight: 600; font-size: 10.5px; letter-spacing: .14em; }
+.ficha-cab { display: flex; flex-direction: column; align-items: stretch; padding: 4px 0; }
+.ficha-figu { position: relative; width: min(100%, 250px); align-self: center; transform: rotate(-1.5deg); margin: 6px 0 16px; }
+.ficha-nota { position: absolute; right: -10px; top: -10px; }
+.ficha-titulo { font-size: 26px; overflow-wrap: anywhere; }
+.ficha-titulo.tocable { display: block; width: 100%; }
+.ficha-artista { font-size: 15px; margin-top: 2px; }
+.ficha-botones { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.lecturas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin-top: 12px; background: var(--borde); border: 1px solid var(--borde); border-radius: 4px; overflow: hidden; }
+.lecturas > div { background: var(--fondo); padding: 7px 9px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.lecturas b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lecturas .fmt { font-size: 13px; }
+.lecturas .camelot { font-size: 13px; line-height: 20px; }
+.lecturas .energia { margin-top: 4px; }
+.espectro { position: relative; border-radius: var(--r-md); overflow: hidden; background: #000; }
+.espectro img { display: block; width: 100%; height: 190px; object-fit: fill; }
+.espectro-khz span { position: absolute; left: 3px; transform: translateY(-50%); font: 10px var(--font-mono); color: #aeb6bf; text-shadow: 0 0 3px #000; }
+.espectro-khz span.u { transform: none; top: 2px; }
+.espectro-linea { position: absolute; left: 0; right: 0; border-top: 2px solid #fff; }
+.espectro-linea.mal { border-top-color: var(--nota-f); }
+.espectro-linea.ref { border-top: 1px dashed #7dd3fc; }
+.espectro-linea span { position: absolute; right: 4px; bottom: 3px; font: 600 10.5px var(--font); background: rgba(0, 0, 0, .78); padding: 1px 5px; border-radius: 3px; white-space: nowrap; color: #fff; }
+.espectro-linea.mal span { color: var(--nota-f); }
+.espectro-linea.ref span { color: #7dd3fc; bottom: auto; top: 3px; }
+[data-cabina] .ficha-titulo { font-size: 30px; }
+[data-cabina] .lecturas b { font-size: 19px; }
+
+.player-cover.sin { display: grid; place-items: center; font: 18px var(--font-titulo); color: rgba(255, 255, 255, .6); }
+.figu-img { font-size: clamp(28px, 6vw, 72px); color: rgba(255, 255, 255, .6); }
+.pl-cab .pl-name { font-size: 26px; font-family: var(--font-titulo); font-weight: 400; letter-spacing: .02em; text-transform: uppercase; color: var(--crema); }
+[data-cabina] .esc-arriba { grid-template-columns: min(28vh, 300px) minmax(0, 1fr); }
+[data-cabina] .esc-titulo { -webkit-line-clamp: 2; font-size: clamp(34px, 3.8vw, 60px); }
+[data-cabina] .onda-grande { height: clamp(60px, 10vh, 110px); }
+
+/* ---------- asistente de primera vez: la figurita y el nombre con la letra de la plaqueta ---------- */
+.wizard.center { background: var(--trama), radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--acento) 12%, transparent), transparent 60%), var(--fondo); }
+.wizard-figu { width: 150px; transform: rotate(-4deg); filter: drop-shadow(5px 5px 0 #000); margin-bottom: -6px; }
+.brand-big { font: 72px/1 var(--font-titulo); letter-spacing: .04em; color: var(--acento); -webkit-text-stroke: 1.5px #000; paint-order: stroke fill; text-shadow: 3px 3px 0 #000; }
+.wizard.review h2 { font: 30px/1 var(--font-titulo); letter-spacing: .02em; text-transform: uppercase; color: var(--crema); }
+.estilos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); max-width: 640px; }
+.estilos .casilla { margin: 0; }
+
+/* ---------- la ficha en grande (pantalla entera) ---------- */
+.ficha-page { padding-top: var(--sp-4); }
+.ficha-page > .link { margin-bottom: var(--sp-3); display: inline-flex; align-items: center; gap: 4px; }
+.vuelta { transform: rotate(180deg); }
+.ficha-grande { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 0 36px; align-items: start; padding: 0; max-width: 1400px; }
+.ficha-grande > .ficha-cab { grid-row: 1 / span 30; position: sticky; top: 0; }
+.ficha-grande > :not(.ficha-cab) { grid-column: 2; }
+.ficha-grande > section:first-of-type, .ficha-grande > .verdict { margin-top: 0; }
+.ficha-grande .ficha-figu { width: 300px; }
+.ficha-grande .ficha-titulo { font-size: 40px; }
+.ficha-grande .espectro img { height: 280px; }
+.ficha-grande .tag-row { grid-template-columns: 140px 1fr 22px; }
+.ficha-titulo.largo { font-size: 21px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ficha-grande .ficha-titulo.largo { font-size: 30px; }
+.ficha-sello { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) rotate(-14deg); font: 400 40px/1 var(--font-titulo); letter-spacing: .06em; text-transform: uppercase; color: #ff5a5a; border: 4px solid #ff5a5a; border-radius: 9px; padding: 2px 12px; background: rgba(20, 8, 8, .8); white-space: nowrap; pointer-events: none; }
+.ficha-grande .ficha-sello { font-size: 50px; }
+
+/* ---------- la oreja-termómetro (Termometro.tsx): cinco escalones que la cera va llenando; los niveles, marcas debajo ---------- */
+.termometro { margin: 14px 0 6px; max-width: 640px; }
+.t-dato { display: flex; align-items: baseline; gap: 6px; font-size: 15px; color: var(--muted); }
+.t-dato b { color: var(--texto); font: 700 30px/1 var(--font-mono); }
+.t-por { color: var(--texto-suave); font-size: 16px; }
+.t-barra { position: relative; height: 16px; margin-top: 10px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.t-lleno { position: absolute; left: 0; top: 0; bottom: 0; }
+.t-punta { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #f7dd8a; border: 3px solid var(--fondo); box-shadow: 0 0 0 2px #e6a93c; }
+.t-tramo { position: relative; border-radius: 5px; background: #23262d; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .6); }
+.t-tramo:nth-child(1) .t-lleno { background-color: #f7e3a0; }
+.t-tramo:nth-child(2) .t-lleno { background-color: #f0cd6c; }
+.t-tramo:nth-child(3) .t-lleno { background-color: #e6b24a; }
+.t-tramo:nth-child(4) .t-lleno { background-color: #d68e2e; }
+.t-tramo:nth-child(5) .t-lleno { background-color: #b86b1e; }
+.t-marcas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; text-align: center; height: 16px; margin-top: 9px; font: 600 10.5px/16px var(--font-rotulo); font-stretch: 75%; letter-spacing: .07em; text-transform: uppercase; color: var(--texto-tenue); }
+.t-marcas span { opacity: .55; white-space: nowrap; }
+.t-marcas span.pasado { opacity: .85; color: var(--texto-suave); }
+.t-marcas span.on { opacity: 1; color: #f2c25a; font-weight: 800; }
+.t-tope { margin: 6px 0 0; font-size: var(--fs-sm); color: var(--atencion); }
+[data-cabina] .t-marcas { font-size: 13px; height: 18px; line-height: 18px; }
+[data-cabina] .t-barra { height: 20px; }
+/* "Guardar vista" y "A Excel" a la derecha de la cabecera de la biblioteca (ViewTools.tsx) */
+.biblio-cab .tabla-acciones { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; align-self: center; }
+.biblio-cab .tabla-acciones input { min-width: 200px; }
+
+/* El estado de la colección en el Inicio (Estado.tsx, 02/11; antes «Primeros pasos»): cada fila entera es clicable; la que sigue resalta */
+.pasos { margin-bottom: var(--sp-4); }
+.pasos-lista { list-style: none; margin: 0; padding: 4px 8px 4px; }
+.pasos-lista li { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--borde); }
+.pasos-lista li:first-child { border-top: 0; }
+.pasos-fila { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 12px; padding: 9px 8px; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; border-radius: 4px; }
+.pasos-fila:hover { background: var(--fondo-hover, rgba(127,127,127,.08)); }
+.pasos-n { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--borde); font-size: 11px; flex: none; align-self: center; }
+.pasos-lista li.hecho .pasos-n { background: var(--ok, #3fa66b); border-color: transparent; color: #fff; }
+.pasos-lista li.hecho b { font-weight: 400; color: var(--texto-suave); }
+.pasos-lista li.toca .pasos-n { border-color: var(--acento); color: var(--acento); }
+.pasos-lista li.toca { box-shadow: inset 3px 0 var(--acento); border-radius: 4px; }
+.pasos-lista li.estado-abierto { display: block; border-top: 0; padding: 0 8px 8px 40px; }
+.pasos-lista .link.small { margin-right: 8px; white-space: nowrap; }
+.estado-cuales ul { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.estado-cuales li { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--borde); padding: 3px 0; }
+.estado-cual { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.estado-pie { display: flex; justify-content: flex-end; padding: 6px 16px 12px; }
+.conviene-antes { margin: 0 0 var(--sp-3); }
+.abierto { transform: rotate(90deg); }
+
+/* Ventana baja (1366×768 con el zoom de Windows al 125 %: quedan ~540 px): arriba, el reproductor y la barra de estado se comían
+   160 px (el 42 %) y en la lista «Faltan o suenan mal» no se veía ni un tema. Más bajos, y los controles al lado de la línea de tiempo
+   (prueba de usabilidad, pantalla chica, 27/10/2026). La cabina tiene su propia medida y no cambia. */
+@media (max-height: 640px) {
+  .app { grid-template-rows: 48px 40px minmax(0, 1fr) 54px 22px; }
+  .player-cover { width: 38px; height: 38px; }
+  .player-centro { flex-direction: row; align-items: center; gap: var(--sp-3); }
+  .player-linea { flex: 1; min-width: 0; }
+  :root:not([data-cabina]) .escuchando { top: calc(48px + 40px); bottom: calc(54px + 22px); }
+}
+/* los avisos, abajo a la derecha (arriba del reproductor): arriba tapaban Aplicar y Descartar de la barra de cambios (el autor, 01/11) */
+.toasts { top: auto; bottom: calc(80px + 26px + 14px); }
+[data-cabina] .toasts { bottom: calc(96px + 26px + 14px); }

@@ -1,0 +1,195 @@
+/* Estilo "historieta" (bocetos-4, docs/diseno/bocetos-4/LEEME.md): todo lo de siempre, dibujado como viñetas de cómic
+   sobre papel negro: borde de tinta, sombra dura, trama de puntos, sellos y la nota como figurita pegada.
+   Se prende con data-estilo="historieta" en <html> (src/estilo.ts). Siempre oscuro; en cabina, papel negro de verdad. */
+
+/* utilidades: lo que se ve solo en un estilo */
+.solo-historieta { display: none !important; }
+[data-estilo="historieta"] .solo-historieta { display: revert !important; }
+[data-estilo="historieta"] .sello.solo-historieta { display: inline-block !important; }
+[data-estilo="historieta"] .td:has(.sello) { overflow: visible; }
+[data-estilo="historieta"] .solo-actual { display: none !important; }
+
+/* sello: una palabra estampada (SUENA A 128, SIN PÉRDIDA, COMO FUE GRABADO, YA LO TENÉS, TRUCHO) */
+.sello { display: inline-block; font: 400 12.5px/1 var(--font-titulo); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px 2px; border: 2px solid currentColor; border-radius: 4px; transform: rotate(-3deg); white-space: nowrap; vertical-align: middle; }
+.sello-mal { color: #ff6b6b; background: rgba(248, 113, 113, .12); }
+.sello-bien { color: #34d399; background: rgba(52, 211, 153, .12); }
+.sello-info { color: #7dd3fc; background: rgba(125, 211, 252, .12); }
+.sello-violeta { color: #c7b5ff; background: rgba(167, 139, 250, .14); }
+.sello-atencion { color: #facc15; background: rgba(250, 204, 21, .12); }
+.dens-compacta .sello, [data-cabina] .sello { transform: none; }
+
+[data-estilo="historieta"] {
+  --fondo: #17120e;
+  --superficie: #221a14;
+  --superficie-2: #2c231b;
+  --superficie-3: #3a2e24;
+  --borde: #3d3026;
+  --borde-suave: #2e241c;
+  --borde-fuerte: #5a4636;
+  --encima: #2e241c;
+  --elegido: rgba(255, 154, 60, .2);
+  --texto: #f3e9d6;
+  --texto-suave: #c4b49c;
+  --texto-tenue: #8c7d6b;
+  --trama: radial-gradient(circle at 4.5px 4.5px, rgba(246, 234, 211, .075) 1px, transparent 1.5px) 0 0 / 8px 8px; /* 8 px: ver tokens.css */
+  --tinta: #000;
+  --sombra-dura: 4px 4px 0 #000;
+  --sombra-chica: 2px 2px 0 #000;
+  --papel-2: #0f0b08;
+}
+[data-estilo="historieta"][data-cabina] {
+  --fondo: #050403; --superficie: #120d09; --superficie-2: #1d1610; --superficie-3: #2a2018; --borde: #4d3e30; --borde-fuerte: #75604b;
+  --texto: #fff; --texto-suave: #e2d6c2; --texto-tenue: #b3a38c; --papel-2: #000;
+  --trama: radial-gradient(circle at 4.5px 4.5px, rgba(246, 234, 211, .055) 1px, transparent 1.5px) 0 0 / 8px 8px;
+}
+[data-estilo="historieta"] body { background: var(--trama), var(--fondo); }
+
+/* ---------- viñetas: cajas con borde de tinta y sombra dura ---------- */
+[data-estilo="historieta"] :is(.box, .tile, .card, .callout, .grupos-problemas, .mb-table, .tidy-profile, .tidy-hand, .cover-card, .purge, .paso, .seguir, .heroe, .cifra, .lecturas, .aviso, .recovery, .update-notice, .esc-cola .pq-inline, .player-pop, .cols-menu) {
+  border: 2.5px solid var(--tinta); border-radius: 8px; box-shadow: var(--sombra-dura);
+}
+[data-estilo="historieta"] :is(.box-head, .paso-cab) { background: var(--superficie-2); border-bottom: 2px solid var(--tinta); }
+[data-estilo="historieta"] .heroe, [data-estilo="historieta"] .biblio-cab { background: radial-gradient(circle at 15% 45%, rgba(255, 154, 60, .12), transparent 55%), var(--superficie); }
+[data-estilo="historieta"] .modal { border: 3px solid var(--tinta); box-shadow: 6px 6px 0 #000; }
+[data-estilo="historieta"] .toast { border: 2.5px solid var(--tinta); box-shadow: var(--sombra-chica); }
+[data-estilo="historieta"] .card:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #000; }
+
+/* ---------- botones: borde de tinta y sombra; al tocar, se "aprietan" ---------- */
+[data-estilo="historieta"] .btn { border: 2.5px solid var(--tinta); box-shadow: var(--sombra-chica); border-radius: 9px; font-weight: 700; }
+[data-estilo="historieta"] .btn.ghost { background: var(--superficie-2); }
+[data-estilo="historieta"] .btn:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 #000; }
+[data-estilo="historieta"] .btn:active:not(:disabled) { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #000; }
+[data-estilo="historieta"] .btn.small { border-width: 2px; border-radius: 7px; }
+[data-estilo="historieta"] :is(input[type=text], input[type=search], input:not([type]), select, textarea) { border: 2px solid var(--tinta); background: #120e0a; box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .4); }
+[data-estilo="historieta"] .casilla { border: 2px solid var(--tinta); }
+[data-estilo="historieta"] .casilla.on { background: var(--acento-suave); box-shadow: var(--sombra-chica); }
+[data-estilo="historieta"] .tab.on { color: var(--acento); }
+[data-estilo="historieta"] .pill { border: 1.5px solid currentColor; }
+
+/* ---------- la nota: figurita pegada, un poco torcida ---------- */
+[data-estilo="historieta"] .grade { border-width: 2px; box-shadow: 1.5px 1.5px 0 #000; transform: rotate(-4deg); font-size: 14px; line-height: 17px; }
+[data-estilo="historieta"] .dens-compacta .grade, [data-estilo="historieta"][data-cabina] .grade { transform: none; }
+
+/* ---------- títulos: borde y sombra de historieta ---------- */
+[data-estilo="historieta"] :is(.titulo, .cabecera-2 h2, .page > h2) { -webkit-text-stroke: 1px #000; paint-order: stroke fill; text-shadow: 3px 3px 0 #000; }
+[data-estilo="historieta"] .titulo .acento { -webkit-text-stroke: 1.5px #000; }
+
+/* ---------- marco: barra de arriba, barra lateral como pestañas de carpeta ---------- */
+[data-estilo="historieta"] .top { background: var(--trama), var(--papel-2); border-bottom: 3px solid var(--tinta); }
+[data-estilo="historieta"] .brand img { width: 40px; height: 40px; }
+[data-estilo="historieta"] .searchbox input { border-radius: 19px; }
+[data-estilo="historieta"] .side, [data-estilo="historieta"] .side-scroll, [data-estilo="historieta"] .side-foot { background: var(--trama), var(--papel-2); }
+[data-estilo="historieta"] .side { border-right: 3px solid var(--tinta); }
+[data-estilo="historieta"] .side-scroll { padding-right: 0; }
+[data-estilo="historieta"] .side-item { border: 2px solid transparent; border-right: 0; border-radius: 9px 0 0 9px; font-weight: 600; }
+[data-estilo="historieta"] .side-item.on { background: var(--acento); color: var(--acento-texto); border-color: var(--tinta); margin-right: -3px; width: calc(100% + 3px); box-shadow: -3px 3px 0 #000; z-index: 1; }
+[data-estilo="historieta"] .side-item.on::before { display: none; }
+[data-estilo="historieta"] .side-item.on :is(.side-ico, .count) { color: var(--acento-texto); opacity: 1; }
+[data-estilo="historieta"] .main, [data-estilo="historieta"] .page, [data-estilo="historieta"] .home { background: var(--trama), var(--fondo); }
+[data-estilo="historieta"] .page::before { display: none; }
+[data-estilo="historieta"] .statusbar { background: var(--papel-2); border-top: 2px solid var(--tinta); }
+
+/* ---------- tabla: planilla de álbum (cabecera negra, filas punteadas) ---------- */
+[data-estilo="historieta"] .thead { background: #000; border-bottom: 2.5px solid #000; }
+[data-estilo="historieta"] .th, [data-estilo="historieta"] .th-dual button { color: var(--crema); font: 400 13.5px/1 var(--font-titulo); letter-spacing: .06em; }
+[data-estilo="historieta"] .th:hover { color: var(--acento); }
+[data-estilo="historieta"] .tr { border-bottom: 1.5px dashed rgba(246, 234, 211, .1); }
+[data-estilo="historieta"] .tr.sel { background: rgba(255, 154, 60, .2); box-shadow: inset 4px 0 var(--acento), inset 0 2px var(--acento), inset 0 -2px var(--acento); color: #fff; }
+[data-estilo="historieta"] .tapa-fila { border: 2px solid #000; border-radius: 4px; }
+[data-estilo="historieta"] .camelot { border: 1.5px solid #000; border-radius: 9px; font-family: var(--font-titulo); font-weight: 400; letter-spacing: .03em; }
+[data-estilo="historieta"] .table { background: var(--superficie); }
+
+/* ---------- Inicio, ficha, Escuchando ---------- */
+[data-estilo="historieta"] .heroe-oreja img { width: 100%; height: auto; max-height: 230px; }
+[data-estilo="historieta"] .barra-notas { height: 22px; border: 2.5px solid #000; border-radius: 8px; box-shadow: var(--sombra-chica); gap: 0; }
+[data-estilo="historieta"] .barra-notas i + i { border-left: 2px solid #000; }
+[data-estilo="historieta"] .tarjeta-tapa, [data-estilo="historieta"] .discos .tapa { border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
+[data-estilo="historieta"] .tarjeta:nth-child(odd) .tarjeta-tapa { transform: rotate(-1.5deg); }
+[data-estilo="historieta"] .tarjeta:nth-child(even) .tarjeta-tapa { transform: rotate(1.2deg); }
+[data-estilo="historieta"] .tarjeta b { font: 400 16px/1.15 var(--font-titulo); text-transform: uppercase; letter-spacing: .02em; }
+[data-estilo="historieta"] .seguir-tapa { border: 3px solid #000; box-shadow: 3px 3px 0 #000; transform: rotate(-3deg); }
+[data-estilo="historieta"] .figu { border-width: 3px; box-shadow: 5px 5px 0 #000; }
+[data-estilo="historieta"] .lecturas { background: #000; gap: 2px; }
+[data-estilo="historieta"] .lecturas > div { background: var(--superficie); }
+[data-estilo="historieta"] .lecturas b { font: 400 21px/1.1 var(--font-titulo); letter-spacing: .02em; }
+[data-estilo="historieta"] .espectro { border: 2.5px solid #000; box-shadow: var(--sombra-chica); }
+
+/* ---------- reproductor ---------- */
+[data-estilo="historieta"] .player { background: var(--trama), var(--papel-2); border-top: 3px solid var(--tinta); }
+[data-estilo="historieta"] .player-cover { border: 3px solid #000; box-shadow: 3px 3px 0 #000; transform: rotate(-3deg); }
+[data-estilo="historieta"] .player-info b { font: 400 19px/1.05 var(--font-titulo); letter-spacing: .02em; text-transform: uppercase; }
+[data-estilo="historieta"] .play { border: 3px solid #000; box-shadow: 3px 3px 0 #000; }
+[data-estilo="historieta"] .pil { border: 2px solid #000; background: var(--superficie); }
+[data-estilo="historieta"] .onda-cabezal { width: 3px; border: 1px solid #000; }
+[data-estilo="historieta"] .esc-ctl .play { box-shadow: 5px 5px 0 #000; }
+[data-estilo="historieta"] .esc-cola { border-left: 3px solid var(--tinta); background: var(--trama), var(--papel-2); }
+
+/* ---------- pasos (NAPIA y recorridos): el número como plaqueta ---------- */
+[data-estilo="historieta"] .paso-n { border-width: 2.5px; width: 34px; height: 34px; font-size: 20px; }
+[data-estilo="historieta"] .zona-soltar { border: 2.5px dashed var(--borde-fuerte); background: #120e0a; }
+[data-estilo="historieta"] .fila-estado { border-bottom: 1.5px dashed rgba(246, 234, 211, .1); }
+[data-estilo="historieta"] .cifra b { font-size: 34px; }
+
+/* ---------- la explicación de la nota como tira de historieta: el archivo dice… / es en realidad… / por qué ---------- */
+[data-estilo="historieta"] .verdict { background: none; border: 0; box-shadow: none; padding: 0; display: grid; gap: 12px; }
+[data-estilo="historieta"] .verdict-arrow { display: none; }
+[data-estilo="historieta"] .verdict-row { position: relative; border: 2.5px solid var(--tinta); border-radius: 8px; box-shadow: var(--sombra-chica); background: var(--superficie); padding: 30px 14px 12px; }
+[data-estilo="historieta"] .verdict-row > span:first-child { position: absolute; top: -2px; left: -2px; font: 400 13px/1 var(--font-titulo); letter-spacing: .06em; text-transform: uppercase; color: #1b140f; background: #facc15; border: 2px solid #000; padding: 4px 8px; border-radius: 0 0 8px 0; }
+[data-estilo="historieta"] .verdict-row:first-child > div { font: 400 24px/1.1 var(--font-titulo); letter-spacing: .02em; }
+[data-estilo="historieta"] .verdict-is b { font: 400 20px/1.15 var(--font-titulo); letter-spacing: .02em; }
+[data-estilo="historieta"] .verdict > .muted.small { display: none; }
+[data-estilo="historieta"] .verdict ul { position: relative; list-style: none; margin: 0; padding: 12px 16px; background: #fff7e6; color: #1b140f; border: 2.5px solid #000; border-radius: 18px; box-shadow: var(--sombra-chica); font: 700 13.5px/1.35 'Comic Sans MS', 'Segoe Print', cursive; }
+[data-estilo="historieta"] .verdict ul::after { content: ''; position: absolute; left: 28px; bottom: -10px; width: 16px; height: 16px; background: #fff7e6; border-right: 2.5px solid #000; border-bottom: 2.5px solid #000; transform: rotate(45deg) skew(10deg, 10deg); }
+[data-estilo="historieta"] .verdict li + li { margin-top: 4px; }
+[data-estilo="historieta"] .verdict > .small.muted:last-child { margin-top: 6px; }
+[data-estilo="historieta"] .ficha-grande .verdict { grid-template-columns: 1fr 1.3fr; }
+[data-estilo="historieta"] .ficha-grande .verdict ul, [data-estilo="historieta"] .ficha-grande .verdict > :last-child { grid-column: 1 / -1; }
+[data-estilo="historieta"][data-cabina] .verdict ul { font-family: var(--font); }
+[data-estilo="historieta"] .espectro-linea span { font: 400 13px/1 var(--font-titulo); letter-spacing: .04em; border: 2px solid #000; padding: 3px 7px; border-radius: 5px; }
+[data-estilo="historieta"] .espectro-linea.mal span { background: #ff6b6b; color: #1b0c0c; }
+[data-estilo="historieta"] .espectro-linea.ref span { background: #7dd3fc; color: #0b1a26; }
+
+/* ---------- playlist: el mosaico como portada, botones agrupados ---------- */
+[data-estilo="historieta"] .pl-bar { background: var(--trama), var(--papel-2); border-bottom: 3px solid var(--tinta); }
+[data-estilo="historieta"] .pl-tapa { width: 110px; height: 110px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; transform: rotate(-2deg); border-radius: 6px; }
+[data-estilo="historieta"] .pl-cab .pl-name { font-size: 34px; text-shadow: 2px 2px 0 #000; }
+[data-estilo="historieta"] .pl-sep { width: 2.5px; background: #000; }
+[data-estilo="historieta"] .pl-menu { border: 2.5px solid #000; box-shadow: var(--sombra-chica); background: var(--superficie); }
+[data-estilo="historieta"][data-cabina] .pl-tapa { transform: none; }
+
+/* ---------- NAPIA: dos columnas (qué bajar | dónde, cómo y bajar); mientras baja, la bajada va a todo el ancho ---------- */
+[data-estilo="historieta"][data-app="napia"] { --elegido: rgba(167, 139, 250, .2); }
+@media (min-width: 1040px) {
+  /* la fila 4 (1fr) se queda con lo que sobra del paso 1, que es largo: así los pasos 2 y 3 quedan pegados */
+  [data-estilo="historieta"] .napia-main { max-width: 1320px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 28px; align-items: start; align-content: start; }
+  [data-estilo="historieta"] .napia-main > :not(section) { grid-column: 1 / -1; grid-row: 1; }
+  [data-estilo="historieta"] .napia-main > section:nth-of-type(1) { grid-column: 1; grid-row: 2 / span 3; }
+  [data-estilo="historieta"] .napia-main > section:nth-of-type(2) { grid-column: 2; grid-row: 2; }
+  [data-estilo="historieta"] .napia-main > section:nth-of-type(3) { grid-column: 2; grid-row: 3; }
+  [data-estilo="historieta"] .napia-main > section:nth-of-type(3):has(.avance-cab) { grid-column: 1 / -1; grid-row: 5; }
+}
+[data-estilo="historieta"] .napia-cab { border-bottom: 3px solid var(--tinta); }
+[data-estilo="historieta"] .paso-cab h3 { font: 400 24px/1 var(--font-titulo); letter-spacing: .03em; text-transform: uppercase; }
+[data-estilo="historieta"] .paso-n { border-radius: 6px; background: var(--acento); color: var(--acento-texto); border: 2.5px solid #000; box-shadow: var(--sombra-chica); transform: rotate(-4deg); }
+[data-estilo="historieta"] .paso.hecho .paso-n { background: #34d399; color: #04130c; border-color: #000; }
+[data-estilo="historieta"] .napia-main .paso-cuerpo { padding-left: var(--sp-4); }
+[data-estilo="historieta"] .vista-lista { border: 2.5px solid #000; background: #120e0a; }
+/* los estados de cada tema (BAJADO, YA LO TENÉS, NO SE ENCONTRÓ…) como sellos */
+[data-estilo="historieta"] .fila-estado .pill { font: 400 12px/1 var(--font-titulo); letter-spacing: .06em; text-transform: uppercase; background: transparent; border: 2px solid currentColor; border-radius: 4px; padding: 4px 7px 3px; transform: rotate(-3deg); }
+[data-estilo="historieta"][data-cabina] .fila-estado .pill, [data-estilo="historieta"][data-cabina] .paso-n { transform: none; }
+
+/* ---------- la oreja-termómetro: escalones con borde de tinta, cera con trama de puntos, marcas en Anton ---------- */
+[data-estilo="historieta"] .t-dato b { font: 400 56px/.9 var(--font-titulo); letter-spacing: 0; color: var(--crema); -webkit-text-stroke: 1px #000; paint-order: stroke fill; text-shadow: 3px 3px 0 #000; }
+[data-estilo="historieta"] .t-punta { width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 3px solid #000; box-shadow: 2px 2px 0 #000; }
+[data-estilo="historieta"] .t-barra { height: 22px; }
+[data-estilo="historieta"] .t-tramo { border: 2.5px solid #000; border-radius: 6px; background: #120e0a; box-shadow: 2px 2px 0 #000; }
+[data-estilo="historieta"] .t-tramo .t-lleno { background-image: radial-gradient(circle at 4.5px 4.5px, rgba(0, 0, 0, .2) 1px, transparent 1.6px); background-size: 8px 8px; }
+[data-estilo="historieta"] .t-marcas { font: 400 13px/16px var(--font-titulo); letter-spacing: .05em; }
+[data-estilo="historieta"] .t-marcas span.on { color: #facc15; text-shadow: 1px 1px 0 #000; font-weight: 400; }
+
+/* ---------- lo que scrollea lleva la trama pegada al contenido (va al final: los "background" de arriba la pisarían) ----------
+   Con la trama fija como fondo de una lista que scrollea, Chromium no puede mover la lista de una sola vez: la redibuja a
+   pedazos, y al scrollear cortito los títulos de la barra lateral (Biblioteca, Playlists, Ordenar…) se desfasaban un instante;
+   además los puntos quedaban quietos mientras el texto pasaba por encima. Es el mismo problema que explica layout.css
+   (.side-scroll, fondo sólido), que la trama de historieta había vuelto a traer (23/10). Se ve igual. */
+[data-estilo="historieta"] :is(.side, .side-scroll, .page, .home, .esc-cola) { background-attachment: local; } /* .side: scrollea entera en ventanas bajas (layout.css) */

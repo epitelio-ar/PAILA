@@ -1,0 +1,27 @@
+{
+  "name": "napia",
+  "productName": "NAPIA",
+  "version": "1.0.0",
+  "description": "Panel de control para sockseek (el programa que baja de Soulseek): arma la lista, lo corre y muestra el avance. NAPIA no baja nada: baja sockseek.",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "main": "out/main/main.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview"
+  },
+  "devDependencies": {
+    "@paila/core": "*",
+    "@paila/diseno": "*",
+    "@paila/shared": "*",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.6",
+    "@vitejs/plugin-react": "5.2.0",
+    "electron": "43.8.4",
+    "electron-vite": "5.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "vite": "7.3.7"
+  }
+}

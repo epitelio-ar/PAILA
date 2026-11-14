@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "nota": "Laboratorio de archivos difíciles (MASTERPLAN-2, 0.2). Cada archivo es una copia de un caso real de una biblioteca; acá va solo su huella (sha256) y lo que PAILA tiene que hacer con él. La música vive en PAILA_CORPUS (por defecto C:/PAILA-laboratorio), nunca en git. Correr con: npm run corpus",
+  "archivos": []
+}

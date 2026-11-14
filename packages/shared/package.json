@@ -1,0 +1,11 @@
+{
+  "name": "@paila/shared",
+  "version": "0.1.0",
+  "description": "El contrato entre el núcleo, el proceso principal y la interfaz: los tipos (PailaApi) y las ayudas que usan los dos lados.",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "exports": {
+    "./types": "./types/index.ts",
+    "./*": "./*.ts"
+  }
+}

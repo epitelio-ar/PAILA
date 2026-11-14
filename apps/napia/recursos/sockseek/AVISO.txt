@@ -1,0 +1,24 @@
+sockseek con freno (para NAPIA) — VERSIÓN MODIFICADA, NO ES LA OFICIAL
+
+Este sockseek.exe (versión 3.0.6-napia.2) es una versión modificada de sockseek 3.0.6
+(https://github.com/fiso64/sockseek, licencia AGPL-3.0) armada con una versión modificada de
+Soulseek.NET 10.0.2 (https://github.com/jpdillingham/Soulseek.NET, licencia GPL-3.0 con términos
+adicionales). No la mantienen ni la avalan los autores de sockseek ni de Soulseek.NET.
+
+This is a modified version of Soulseek.NET.  It is not maintained by, endorsed by, or affiliated with the Soulseek.NET project or its author(s).
+
+Qué cambia (21/10/2026, Bllly Shears, para NAPIA):
+- Soulseek.NET: los pedidos del servidor para conectarse con otro usuario (ConnectToPeer, tipo P)
+  pasan por una fila: como mucho 48 a la vez, 25 por segundo, y se descartan los que esperan más de
+  6 segundos. Los usuarios de los que se está bajando pasan sin fila. Sin esto, con el puerto
+  cerrado, cada búsqueda abre miles de conexiones a la vez y muchos routers de casa se traban.
+  Se ajusta con SOULSEEK_SOLICITED_MAX, SOULSEEK_SOLICITED_PER_SECOND y SOULSEEK_SOLICITED_WAIT_MS.
+- sockseek: usa esa copia de Soulseek.NET y se identifica ante el servidor de Soulseek con su propio
+  número de cliente (826102100), distinto del de sockseek (800850000-800859999).
+
+Código fuente: el de esas dos versiones más el parche apps/napia/sockseek-freno/freno.patch del
+repositorio de PAILA; apps/napia/sockseek-freno/armar.ps1 lo arma igual. Todo junto (las dos versiones,
+el parche y cómo se arma) va adjunto a cada versión de PAILA, en https://github.com/epitelio-ar/PAILA/releases
+(sockseek-napia-fuente.tar.gz). Las licencias completas
+están en esta carpeta: LICENCIA-sockseek-AGPL-3.0.txt, LICENCIA-Soulseek.NET-GPL-3.0.txt (con sus
+términos adicionales; el mismo texto está en LICENSE, el nombre que piden esos términos) y NOTICE-Soulseek.NET.txt.

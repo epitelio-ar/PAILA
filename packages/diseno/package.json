@@ -1,0 +1,15 @@
+{
+  "name": "@paila/diseno",
+  "version": "0.2.0",
+  "description": "El diseño compartido de PAILA y NAPIA: tokens, base, componentes (botón, nota, caja, barra, aviso, ventana, ⓘ, pasos, cifras, filas con estado) y el muestrario.",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./muestrario": "./src/Muestrario.tsx",
+    "./estilos.css": "./estilos.css",
+    "./tokens.css": "./tokens.css",
+    "./componentes.css": "./componentes.css",
+    "./base.css": "./base.css"
+  }
+}

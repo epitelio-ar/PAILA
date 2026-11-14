@@ -1,0 +1,210 @@
+/* Tokens del diseño de la familia PAILA + NAPIA: colores por función, letras, espacios, radios, sombras, capas y movimiento. */
+
+/* La letra de los títulos (la de la plaqueta de las figuritas): Anton, OFL-1.1, viaja con la app (letras/OFL-Anton.txt). */
+@font-face { font-family: "Anton"; src: url("./letras/Anton-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+/* Base oscura (cómoda para escuchar de noche, en el estudio o en una cabina). Cada app pone su acento con data-app="paila|napia". */
+:root {
+  color-scheme: dark;
+
+  /* colores por función: fondo y superficies, de lo más lejano a lo más cercano */
+  --fondo: #0e1013;
+  --superficie: #15181c;
+  --superficie-2: #1b1f24;
+  --superficie-3: #232830;
+  --borde: #272c33;
+  --borde-suave: #1f2429;
+  --borde-fuerte: #3a424c;
+  --encima: #1d2227;        /* fila o botón con el mouse encima */
+  --elegido: #26324a;       /* fila elegida */
+
+  /* texto */
+  --texto: #e9ebee;
+  --texto-suave: #8e97a3;
+  --texto-tenue: #66707b;
+
+  /* estados: ok (listo, bien), atención (mirá esto), error (falló), info (dato) */
+  --ok: #46c06e;
+  --ok-suave: rgba(70, 192, 110, 0.14);
+  --atencion: #f5d84a;
+  --atencion-suave: rgba(245, 216, 74, 0.14);
+  --error: #ef5b52;
+  --error-suave: rgba(239, 91, 82, 0.14);
+  --info: #6aa4ff;
+  --info-suave: rgba(106, 164, 255, 0.14);
+
+  /* colecciones de PAILA */
+  --k-musica: #5b9bff;
+  --k-produccion: #c084fc;
+  --k-proyectos: #34d399;
+  --k-sets: #f59e0b;
+  --k-revisar: #f87171;
+  --k-excluir: #6b7280;
+
+  /* un color fijo por nota de calidad: el mismo en la tabla, el Inicio, los gráficos y la ficha */
+  --nota-ap: #22d3ee;
+  --nota-a: #34d399;
+  --nota-b: #a3e635;
+  --nota-c: #facc15;
+  --nota-d: #fb923c;
+  --nota-f: #f87171;
+  --nota-sin: var(--borde);
+  --nota-texto: #101215;
+
+  /* ocho colores para cosas sin orden (formatos, géneros) en los gráficos: no se confunden con las notas ni con el acento */
+  --serie-1: #5b9bff; --serie-2: #c084fc; --serie-3: #2dd4bf; --serie-4: #f472b6;
+  --serie-5: #94a3b8; --serie-6: #818cf8; --serie-7: #e879f9; --serie-8: #64748b;
+
+  /* identidad de las figuritas: el papel crema y la trama de puntos de impresión */
+  --crema: #f6ead3;
+  /* la baldosa de 8 px da puntos enteros en todas las escalas de Windows (100, 125, 150, 175 %): con 6 o 7 caían desparejos y se veían franjas. El centro en 4,5 cae en el medio de un pixel (a 100 y 125 %): en 4 cada punto se borroneaba en 2 × 2 */
+  --trama: radial-gradient(circle at 4.5px 4.5px, rgba(255, 220, 170, 0.08) 1px, transparent 1.4px) 0 0 / 8px 8px;
+
+  /* espacios */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* radios */
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+
+  /* sombras */
+  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --sombra-2: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --sombra-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  /* capas: de abajo hacia arriba */
+  --z-barra: 2;
+  --z-ventana: 50;
+  --z-cubre: 100;
+  --z-aviso: 200;
+  --z-tip: 300;
+
+  /* letra: una familia, una escala, y números de ancho fijo para BPM, tiempos y kbps */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: Consolas, "Cascadia Mono", monospace;
+  /* títulos con la letra de la plaqueta de la figurita (Anton, empaquetada) y rótulos angostos tipo consola (salto estético, 22/10) */
+  --font-titulo: "Anton", Impact, "Arial Narrow", sans-serif;
+  --font-rotulo: Bahnschrift, "Segoe UI", sans-serif;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
+  --fw-normal: 400;
+  --fw-medio: 500;
+  --fw-fuerte: 650;
+  --fw-negrita: 800;
+  --lh-ajustado: 1.25;
+  --lh-normal: 1.5;
+  --lh-suelto: 1.65;
+
+  /* movimiento corto (con "reducir movimiento" de Windows pasa a casi cero, abajo) */
+  --mov-rapido: 120ms;
+  --mov-medio: 220ms;
+  --mov-lento: 300ms;
+  --curva: ease;
+
+  /* medidas de la app */
+  --side-w: 236px;
+  --detail-w: 380px;
+  --fila-alto: 32px;        /* fila de las tablas (src/cabina.ts lo usa en la tabla de temas) */
+}
+
+/* acento de PAILA (ámbar) y de NAPIA (violeta): la misma base con otro color de marca */
+:root, [data-app="paila"] {
+  --acento: #ff9a3c;
+  --acento-hover: #ffb066;
+  --acento-texto: #1f1004;
+  --acento-suave: rgba(255, 154, 60, 0.14);
+  --acento-linea: rgba(255, 154, 60, 0.5);
+}
+[data-app="napia"] {
+  --acento: #a78bfa;
+  --acento-hover: #bda6ff;
+  --acento-texto: #120b26;
+  --acento-suave: rgba(167, 139, 250, 0.15);
+  --acento-linea: rgba(167, 139, 250, 0.5);
+}
+
+/* nombres de siempre (los usa todo el código que ya existe): apuntan a los de arriba */
+:root, [data-app] {
+  --bg: var(--fondo);
+  --panel: var(--superficie);
+  --panel-2: var(--superficie-2);
+  --panel-3: var(--superficie-3);
+  --line: var(--borde);
+  --line-soft: var(--borde-suave);
+  --hover: var(--encima);
+  --sel: var(--elegido);
+  --text: var(--texto);
+  --muted: var(--texto-suave);
+  --faint: var(--texto-tenue);
+  --accent: var(--acento);
+  --accent-hover: var(--acento-hover);
+  --accent-text: var(--acento-texto);
+  --accent-soft: var(--acento-suave);
+  --accent-line: var(--acento-linea);
+  --warn: var(--atencion);
+  --warn-soft: var(--atencion-suave);
+  --danger: var(--error);
+  --danger-soft: var(--error-suave);
+  --ok-soft: var(--ok-suave);
+  --g-ap: var(--nota-ap);
+  --g-a: var(--nota-a);
+  --g-b: var(--nota-b);
+  --g-c: var(--nota-c);
+  --g-d: var(--nota-d);
+  --g-f: var(--nota-f);
+  --shadow: var(--sombra-2);
+}
+
+/*
+ * Modo cabina (src/cabina.ts): alto contraste y letra más grande, para leer de lejos o con poca luz. Va en <html> o en una
+ * parte de la pantalla (el muestrario). Fondo negro, texto blanco, bordes y textos secundarios más claros, letra +3 px.
+ */
+[data-cabina] {
+  --fondo: #000000;
+  --superficie: #0b0c0e;
+  --superficie-2: #15181c;
+  --superficie-3: #20242b;
+  --borde: #4b535e;
+  --borde-suave: #343a42;
+  --borde-fuerte: #737d8a;
+  --encima: #262b33;
+  --elegido: #2f4778;
+  --texto: #ffffff;
+  --texto-suave: #cdd3da;
+  --texto-tenue: #a3acb6;
+  --ok: #5ee08a;
+  --atencion: #ffe45c;
+  --error: #ff6b61;
+  --info: #84b6ff;
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 23px;
+  --fs-2xl: 30px;
+  --side-w: 264px;
+  --detail-w: 420px;
+  --fila-alto: 42px;
+}
+[data-cabina][data-app="paila"], [data-cabina] [data-app="paila"] { --acento: #ffab55; --acento-hover: #ffc285; }
+[data-cabina][data-app="napia"], [data-cabina] [data-app="napia"] { --acento: #b9a1ff; --acento-hover: #cdbcff; }
+[data-cabina] *:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+/* "Reducir movimiento" de Windows: sin animaciones largas, solo el cambio de estado */
+@media (prefers-reduced-motion: reduce) {
+  :root, [data-app] { --mov-rapido: 0.01ms; --mov-medio: 0.01ms; --mov-lento: 0.01ms; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+
+/* números de ancho fijo: las columnas de BPM, tiempos y kbps no "bailan" */
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }

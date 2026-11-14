@@ -1,0 +1,13 @@
+/* Modo avanzado: inspector de un tema, cola del análisis y registro de operaciones. */
+.insp-campo { flex: 1; min-width: 240px; }
+.insp-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+.insp-ruta { word-break: break-all; }
+.insp-filas { display: grid; grid-template-columns: max-content 1fr; gap: 3px 16px; margin: 0; }
+.insp-filas > div { display: contents; }
+.insp-filas dt { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.insp-filas dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.insp-items { margin: 8px 0 0; padding-left: 18px; }
+.insp-items li { margin: 3px 0; overflow-wrap: anywhere; }
+.insp-tabla { width: 100%; border-collapse: collapse; }
+.insp-tabla th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 2px 8px 6px 0; }
+.insp-tabla td { padding: 4px 8px 4px 0; vertical-align: top; border-top: 1px solid var(--borde, rgba(255, 255, 255, 0.08)); }

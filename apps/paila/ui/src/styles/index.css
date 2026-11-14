@@ -1,0 +1,12 @@
+@import '@paila/diseno/estilos.css';
+@import './base.css';
+@import './layout.css';
+@import './table.css';
+@import './pages.css';
+@import './escuchar.css';
+@import './marco.css';
+@import './recorrido.css';
+@import './listas.css';
+@import './avanzado.css';
+@import './ordenar.css';
+@import './sonido.css';

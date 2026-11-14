@@ -1,0 +1,78 @@
+/* Ordenar, la revisión única (Ordenar.tsx, OrdenarCarpetas.tsx, OrdenarGrupos.tsx, OrdenarDecidir.tsx). */
+.ord-ancho { max-width: 980px; }
+.ord-titulo { margin: 0 0 var(--sp-1); }
+.ord-opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sp-3); margin: var(--sp-3) 0; }
+.ord-opcion { display: flex; flex-direction: column; gap: var(--sp-1); text-align: left; padding: var(--sp-3); border: 1px solid var(--borde); border-radius: var(--r-md); background: var(--superficie); color: inherit; cursor: pointer; font: inherit; }
+.ord-opcion:hover, .ord-opcion:focus-visible { border-color: var(--acento); }
+.ord-opcion.ord-hoy { border-color: var(--ok); }
+.ord-opcion b + .ord-mejor { align-self: flex-start; }
+.ord-muestra { font-size: 12px; line-height: 1.5; padding: var(--sp-2); border-radius: var(--r-md); background: var(--fondo); overflow: hidden; }
+.ord-muestra b { color: var(--acento); }
+.ord-panel { padding: var(--sp-3); border: 1px solid var(--borde); border-radius: var(--r-md); background: var(--superficie); margin: var(--sp-2) 0; }
+.ord-panel h4 { margin: var(--sp-2) 0; }
+.ord-panel input[type='text'], .ord-panel > input { width: 100%; }
+.ord-editor { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--sp-3); }
+.ord-nivel { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2); border: 1px solid var(--borde); border-radius: var(--r-md); margin-bottom: var(--sp-1); }
+.ord-nivel b { flex: 1; }
+.ord-ejemplo { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--sp-2); }
+
+.ord-carpetas { display: flex; gap: var(--sp-2); align-items: baseline; margin-bottom: var(--sp-2); }
+.ord-barra { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3);
+  padding: var(--sp-3); margin-bottom: var(--sp-3); border: 1px solid var(--borde); border-radius: var(--r-md); background: var(--superficie); }
+.ord-barra-texto { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 2px; }
+.ord-vistas { gap: var(--sp-1); }
+.ord-armando { color: var(--texto-tenue); }
+.ord-internet { margin: 0 0 var(--sp-3); }
+.ord-buscando { display: flex; align-items: center; gap: var(--sp-3); font-size: 13px; margin: 0 0 var(--sp-3); color: var(--texto-tenue); }
+.ord-linea { flex: 1; max-width: 300px; height: 6px; background: var(--superficie-2); border-radius: 3px; overflow: hidden; }
+.ord-linea i { display: block; height: 100%; background: var(--acento); }
+
+.ord-decidir { padding: var(--sp-3); margin-bottom: var(--sp-3); border: 1px solid var(--atencion); border-radius: var(--r-md); }
+.ord-decidir h3 { margin: 0; }
+.ord-tanda { margin-top: var(--sp-3); }
+.ord-tanda-cabeza { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-1); }
+.ord-empuja { margin-left: auto; }
+.ord-cartas { display: flex; flex-direction: column; gap: var(--sp-1); max-height: 360px; overflow-y: auto; }
+.ord-carta { display: flex; flex-direction: column; gap: 2px; padding: var(--sp-1) var(--sp-3); border-radius: var(--r-md); background: var(--superficie); }
+.ord-carta-cabeza { display: flex; align-items: baseline; gap: var(--sp-2); min-width: 0; }
+.ord-porque { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ord-carta .row { flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.ord-carta .btn.small { padding-top: 2px; padding-bottom: 2px; }
+.ord-item { display: flex; align-items: center; gap: var(--sp-2); font-size: 13px; min-height: 28px; }
+.ord-play { width: 18px; flex: none; }
+.ord-item-nombre { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ord-item-datos { white-space: nowrap; }
+.ord-mejor { font-size: 11px; font-weight: 700; color: var(--ok); border: 1px solid var(--ok); border-radius: var(--r-sm); padding: 0 6px; white-space: nowrap; }
+.ord-quien input { min-width: 180px; flex: 1; }
+
+.ord-grupos { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ord-grupo { border: 1px solid var(--borde); border-radius: var(--r-md); background: var(--superficie); }
+.ord-grupo-fila { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); }
+.ord-grupo-boton { flex: 1; display: flex; align-items: center; gap: var(--sp-3); background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; padding: 0; }
+.ord-grupo-texto { flex: 1; min-width: 0; }
+.ord-grupo-n { font-weight: 700; white-space: nowrap; }
+.ord-filas { padding: 0 var(--sp-3) var(--sp-3); max-height: 460px; overflow-y: auto; }
+.ord-tema { font-weight: 600; margin-top: var(--sp-2); font-size: 13px; }
+.ord-fila { display: flex; align-items: baseline; gap: var(--sp-2); padding: 3px 0; font-size: 13px; cursor: pointer; }
+.ord-fila.apagada { opacity: 0.55; }
+.ord-campo { min-width: 90px; color: var(--texto-tenue); }
+.ord-tema-fila { width: 28%; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.ord-carta-cabeza .ord-empuja, .ord-tanda-cabeza .ord-empuja { flex: none; margin-left: auto; }
+.ord-carta-cabeza b { white-space: nowrap; }
+.ord-antes, .ord-despues { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.ord-flecha { color: var(--texto-tenue); }
+.ord-error { color: var(--error); font-size: 12px; }
+.ord-chevron { transition: transform var(--mov-rapido); } .ord-chevron.abierto { transform: rotate(90deg); }
+.ord-grupo.ord-apagado { opacity: 0.6; }
+.ord-sin-tilde { width: 16px; flex: none; }
+.ord-pie { display: flex; gap: var(--sp-3); align-items: baseline; padding: 0 var(--sp-3) var(--sp-2); font-size: 13px; }
+
+.ord-arboles { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--sp-3); }
+.ord-arbol { border: 1px solid var(--borde); border-radius: var(--r-md); background: var(--superficie); padding: var(--sp-2) var(--sp-3); min-width: 0; max-height: 640px; overflow-y: auto; }
+.ord-arbol h3 { margin: 0; }
+.ord-arbol details { margin-left: 14px; }
+.ord-arbol > details { margin-left: 0; }
+.ord-arbol summary { cursor: pointer; padding: 2px 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.ord-arbol-n { font-weight: 400; color: var(--texto-tenue); margin-left: 6px; }
+.ord-hoja { font-size: 12.5px; color: var(--texto-tenue); margin-left: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ord-por-tipo { gap: var(--sp-3); flex-wrap: wrap; }

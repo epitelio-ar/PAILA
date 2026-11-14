@@ -1,0 +1,120 @@
+// Los textos de las ventanas de una playlist (pendrive, mejorar, limpiar, fusionar), en castellano y en inglés (ver @paila/shared/idioma).
+import { textos, cant } from '@paila/shared/idioma'
+
+export const T = textos({
+  repetidoTip: {
+    es: 'Repetido: el mismo tema (mismo artista y título, misma versión, duración parecida) guardado en otra calidad, por ejemplo un MP3 de 128 y un FLAC. Se queda el mejor; los demás se sacan de la lista, pero los archivos no se tocan.',
+    en: 'Repeated: the same track (same artist and title, same version, similar length) saved in another quality, for example a 128 MP3 and a FLAC. The best one stays; the others are removed from the list, but the files are not touched.',
+  },
+  desaparecidoTip: {
+    es: 'Desaparecido: un archivo que PAILA ya no encuentra en el disco (lo moviste o borraste por fuera, o el disco no está). Sigue en la lista por si vuelve; si hace más de 30 días que no está, podés sacarlo.',
+    en: "Missing: a file PAILA can't find on the disk anymore (you moved or deleted it outside PAILA, or the drive isn't connected). It stays in the list in case it comes back; if it has been gone for over 30 days, you can remove it.",
+  },
+  // Pendrive o carpeta
+  tituloExport: { es: (nombre: string) => `Playlist a pendrive o carpeta: ${nombre}`, en: (nombre: string) => `Playlist to a USB stick or folder: ${nombre}` },
+  introExport: {
+    es: 'Copia los temas en el orden de la playlist, con nombres numerados y un archivo {archivo}, para tocar en CDJ o en cualquier compu sin Rekordbox. **Copia, no mueve**: tu biblioteca no se toca.',
+    en: 'Copies the tracks in playlist order, with numbered names and a {archivo} file, to play on CDJs or any computer without Rekordbox. **It copies, it does not move**: your library is not touched.',
+  },
+  expListo: {
+    es: (cop: string, conv: string, ya: string | null) => `Listo: ${cop} copiados, ${conv} convertidos${ya ? `, ${ya} ya estaban` : ''}.`,
+    en: (cop: string, conv: string, ya: string | null) => `Done: ${cop} copied, ${conv} converted${ya ? `, ${ya} already there` : ''}.`,
+  },
+  expExpulsar: {
+    es: 'Antes de sacar el pendrive, expulsalo desde Windows. Si lo volvés a correr, retoma sin repetir lo que ya está.',
+    en: "Before you remove the USB stick, eject it from Windows. If you run it again, it picks up without repeating what's already there.",
+  },
+  abrirCarpeta: { es: 'Abrir la carpeta', en: 'Open the folder' },
+  cerrar: { es: 'Cerrar', en: 'Close' },
+  cambiarDestino: { es: 'Cambiar destino…', en: 'Change destination…' },
+  elegirDestino: { es: 'Elegir pendrive o carpeta…', en: 'Pick a USB stick or folder…' },
+  sinDestino: { es: 'Todavía no elegiste dónde guardar', en: "You haven't picked where to save yet" },
+  keepFlacTip: { es: 'Si tu equipo es una CDJ-3000 u otro que lee FLAC, tildalo para no convertir.', en: "If your player is a CDJ-3000 or another one that reads FLAC, tick this so nothing gets converted." },
+  keepFlac: { es: 'Mi equipo lee FLAC (si no, los FLAC pasan a AIFF)', en: 'My player reads FLAC (if not, FLACs become AIFF)' },
+  convertir: { es: 'Convertir lo que las CDJ no leen (WMA, OGG, Opus… a MP3 320; lo demás a AIFF)', en: "Convert what CDJs can't read (WMA, OGG, Opus… to MP3 320; everything else to AIFF)" },
+  numerar: { es: 'Numerar los archivos (001 - Artista - Título) para que queden en orden en equipos sin playlists', en: 'Number the files (001 - Artist - Title) so they stay in order on players without playlists' },
+  subcarpeta: { es: 'Poner todo en una carpeta con el nombre de la playlist', en: 'Put everything in a folder named after the playlist' },
+  fat32Tip: { es: 'Los pendrives FAT32 no admiten nombres largos ni archivos de más de 4 GB.', en: "FAT32 USB sticks don't allow long names or files over 4 GB." },
+  fat32: { es: 'Pendrive FAT32 (nombres cortos y seguros; avisa de archivos de más de 4 GB)', en: 'FAT32 USB stick (short, safe names; warns about files over 4 GB)' },
+  planCabeza: {
+    es: (c: string, cop: string, conv: string, tam: string) => `**${c}** temas: ${cop} se copian y **${conv}** se convierten · **${tam}**`,
+    en: (c: string, cop: string, conv: string, tam: string) => `**${c}** tracks: ${cop} are copied and **${conv}** are converted · **${tam}**`,
+  },
+  planLibre: { es: (b: string) => ` · lugar libre: ${b}`, en: (b: string) => ` · free space: ${b}` },
+  planSaltean: { es: (c: number, lista: string) => `${c} se saltean (${lista})`, en: (c: number, lista: string) => `${c} skipped (${lista})` },
+  ymas: { es: (c: string) => `… y ${c} más`, en: (c: string) => `… and ${c} more` },
+  temas: { es: 'temas', en: 'tracks' },
+  copiando: { es: 'Copiando…', en: 'Copying…' },
+  copiarN: { es: (c: string) => `Copiar ${c} temas`, en: (c: string) => `Copy ${c} tracks` },
+  copiarPreg: { es: (c: string, dest: string) => `¿Copiar ${c} temas a ${dest}?`, en: (c: string, dest: string) => `Copy ${c} tracks to ${dest}?` },
+  cancelar: { es: 'Cancelar', en: 'Cancel' },
+  noAlcanza: { es: 'No alcanza el lugar en el destino.', en: "There isn't enough room at the destination." },
+  // Mejorar
+  tituloMejorar: { es: (nombre: string) => `Mejorar la playlist: ${nombre}`, en: (nombre: string) => `Improve the playlist: ${nombre}` },
+  introMejorar: {
+    es: 'PAILA busca en toda tu biblioteca otra versión del mismo tema (mismo artista y título, duración parecida) con mejor nota o sin pérdida, y la cambia en la lista, en el mismo lugar. No mueve ni borra archivos.',
+    en: 'PAILA looks through your whole library for another version of the same track (same artist and title, similar length) with a better grade or lossless, and swaps it in the list, in the same spot. It does not move or delete files.',
+  },
+  buscandoMejores: { es: 'Buscando versiones mejores…', en: 'Looking for better versions…' },
+  sinMejores: { es: 'No encontré versiones mejores para los temas de esta playlist.', en: "I didn't find better versions for the tracks in this playlist." },
+  cambiarN: { es: (c: string) => `Cambiar ${c} temas`, en: (c: string) => `Swap ${c} tracks` },
+  seDeshace: { es: 'Se puede deshacer.', en: 'You can undo this.' },
+  mejoradas: {
+    es: (c: string) => `Listo: se cambiaron ${c} temas por versiones mejores. Los archivos viejos siguen en tu biblioteca (si ya no los querés, usá Duplicados).`,
+    en: (c: string) => `Done: ${c} tracks were swapped for better versions. The old files are still in your library (if you don't want them anymore, use Duplicates).`,
+  },
+  mejoradasUndo: { es: (c: string) => `Se deshizo: ${c} temas volvieron a su versión anterior.`, en: (c: string) => `Undone: ${c} tracks went back to their previous version.` },
+  deshacerEstos: { es: 'Deshacer estos cambios', en: 'Undo these changes' },
+  // Limpiar
+  tituloLimpiar: { es: (nombre: string) => `Limpiar la playlist: ${nombre}`, en: (nombre: string) => `Clean up the playlist: ${nombre}` },
+  introLimpiar1: { es: 'Saca los temas repetidos', en: 'Removes repeated tracks' },
+  introLimpiar2: { es: ' (queda la mejor versión) y, si querés, los que desaparecieron hace rato', en: ' (the best version stays) and, if you want, the ones that went missing a while ago' },
+  introLimpiar3: { es: '. No mueve ni borra archivos.', en: '. It does not move or delete files.' },
+  buscandoRepetidos: { es: 'Buscando repetidos…', en: 'Looking for repeats…' },
+  nadaLimpiar: { es: 'No hay nada para limpiar: ningún tema repetido ni desaparecido hace rato.', en: 'Nothing to clean up: no repeated tracks and none missing for a while.' },
+  repetidosTitulo: { es: (c: string) => `Repetidos en otra calidad (${c})`, en: (c: string) => `Repeated in another quality (${c})` },
+  queda: { es: 'Queda:', en: 'Stays:' },
+  seSaca: { es: 'Se saca:', en: 'Removed:' },
+  desaparecidosTitulo: { es: (c: string) => `Desaparecidos hace más de 30 días (${c})`, en: (c: string) => `Missing for over 30 days (${c})` },
+  tambienSacar: { es: (c: string) => `También sacar estos ${c} de la playlist`, en: (c: string) => `Also remove these ${c} from the playlist` },
+  sacarN: { es: (c: string) => `Sacar ${c} temas`, en: (c: string) => `Remove ${c} tracks` },
+  limpiada: {
+    es: (c: string) => `Listo: se sacaron ${c} temas de la playlist. Los archivos siguen en tu biblioteca. Se puede deshacer desde acá o desde el Historial.`,
+    en: (c: string) => `Done: ${c} tracks were removed from the playlist. The files are still in your library. You can undo this from here or from History.`,
+  },
+  limpiadaUndo: { es: 'Se deshizo: la playlist quedó como estaba.', en: 'Undone: the playlist is back as it was.' },
+  deshacer: { es: 'Deshacer', en: 'Undo' },
+  // Fusionar
+  tituloFusionar: { es: 'Fusionar playlists', en: 'Merge playlists' },
+  introFusionar1: { es: 'Arma una playlist nueva con los temas de las que elijas, sin repetidos', en: 'Makes a new playlist from the tracks of the ones you pick, with no repeats' },
+  introFusionar2: {
+    es: ': el mismo archivo no entra dos veces y, si un tema está en dos calidades, queda la mejor. No toca archivos.',
+    en: ": the same file doesn't go in twice and, if a track is in two qualities, the best one stays. It doesn't touch files.",
+  },
+  nombreFusionada: { es: (nombre: string) => `${nombre} (fusionada)`, en: (nombre: string) => `${nombre} (merged)` },
+  fusionada: {
+    es: (nombre: string, c: string) => `Listo: la playlist «${nombre}» tiene ${c} temas. Se puede deshacer desde el Historial.`,
+    en: (nombre: string, c: string) => `Done: the playlist «${nombre}» has ${c} tracks. You can undo this from History.`,
+  },
+  cuentaTemas: { es: (c: string) => `${c} temas`, en: (c: string) => `${c} tracks` },
+  inteligente: { es: ' (inteligente)', en: ' (smart)' },
+  nombreNueva: { es: 'Nombre de la nueva', en: 'Name of the new one' },
+  sacarOriginales: { es: 'Sacar las playlists originales', en: 'Remove the original playlists' },
+  sacarOriginalesTip: {
+    es: 'Las originales se sacan de la lista de playlists (los temas no se tocan). Si te arrepentís, Deshacer en el Historial las devuelve.',
+    en: 'The originals are removed from the playlist list (the tracks are not touched). If you change your mind, Undo in History brings them back.',
+  },
+  alMenosDos: { es: 'Elegí al menos dos playlists.', en: 'Pick at least two playlists.' },
+  fusionResumen: {
+    es: (total: string, unicos: string) => `${total} temas en total → quedan ${unicos}. `,
+    en: (total: string, unicos: string) => `${total} tracks in total → ${unicos} remain. `,
+  },
+  fusionMasDeUna: { es: (c: string) => `${c} estaban en más de una lista. `, en: (c: string) => `${c} were in more than one list. ` },
+  fusionOtraCalidad: { es: (c: string) => `${c} se sacan por estar también en otra calidad.`, en: (c: string) => `${c} are removed because they are also in another quality.` },
+  fusionEjemplo: {
+    es: (saca: string, d1: string, queda: string, d2: string) => `Se saca ${saca} (${d1}); queda ${queda} (${d2})`,
+    en: (saca: string, d1: string, queda: string, d2: string) => `Removing ${saca} (${d1}); keeping ${queda} (${d2})`,
+  },
+  fusionar: { es: 'Fusionar', en: 'Merge' },
+  cuenta: { es: (c: number) => cant(c, 'tema', 'temas'), en: (c: number) => cant(c, 'track', 'tracks') },
+})

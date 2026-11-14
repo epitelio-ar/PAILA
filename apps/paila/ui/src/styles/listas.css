@@ -1,0 +1,123 @@
+/* Listas largas (Faltan o suenan mal, Historial, Discos, Papelera, listas traídas): una fila por cosa, columnas alineadas
+   y el detalle desplegado abajo, nunca apilado de entrada. Antes cada cosa era una caja suelta de tres renglones. */
+.wl-tabla { border: 1px solid var(--borde); border-radius: var(--r-lg); overflow: clip; background: var(--superficie); margin: var(--sp-3) 0; }
+.wl-fila { display: grid; grid-template-columns: 34px minmax(0, 1fr) 170px 180px 132px 132px; gap: 12px; align-items: center; padding: 5px 14px; min-height: 48px; border-top: 1px solid var(--borde-suave); }
+.wl-discos .wl-fila { grid-template-columns: 34px minmax(0, 1fr) 120px 132px 132px; }
+.wl-fila:first-child { border-top: 0; }
+.wl-fila:hover:not(.wl-cab) { background: var(--hover); }
+.wl-fila.skipped { opacity: .5; }
+.wl-cab { position: sticky; top: 0; z-index: 1; min-height: 0; padding: 7px 14px; background: var(--superficie-2); font-size: var(--fs-xs); font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
+.wl-tema { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.wl-por { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.wl-por .pill { margin-left: 0; }
+.wl-fila > .num { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-fila select { width: 100%; padding-top: 3px; padding-bottom: 3px; }
+
+.lista-filas { border: 1px solid var(--borde); border-radius: var(--r-lg); overflow: hidden; background: var(--superficie); margin: var(--sp-2) 0 var(--sp-4); }
+.lista-filas > .box { margin: 0; border: 0; border-radius: 0; box-shadow: none; border-top: 1px solid var(--borde-suave); background: transparent; }
+.lista-filas > .box:first-child { border-top: 0; }
+.lista-filas > .box > .box-head { background: none; border-bottom: 0; padding: 6px 14px; min-height: 44px; }
+.lista-filas > .box > .box-head:hover { background: var(--hover); }
+.lista-filas > .box > :not(.box-head) { background: var(--superficie-2); }
+
+[data-estilo="historieta"] :is(.wl-tabla, .lista-filas) { border: 2.5px solid var(--tinta); border-radius: 8px; box-shadow: var(--sombra-dura); }
+[data-estilo="historieta"] .lista-filas > .box { border: 0; border-top: 1.5px dashed rgba(246, 234, 211, .12); box-shadow: none; }
+[data-estilo="historieta"] .lista-filas > .box:first-child { border-top: 0; }
+[data-estilo="historieta"] .lista-filas > .box > .box-head { background: none; border-bottom: 0; }
+[data-estilo="historieta"] .wl-fila { border-top: 1.5px dashed rgba(246, 234, 211, .1); }
+[data-estilo="historieta"] .wl-fila:first-child { border-top: 0; }
+[data-estilo="historieta"] .wl-cab { background: #000; color: var(--crema); font: 400 13.5px/1 var(--font-titulo); letter-spacing: .06em; }
+
+/* Duplicados: una fila por copia; la que se queda, en verde; las que sobran, un poco apagadas */
+.dup-filas { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--fs-sm); }
+.dup-filas th { text-align: left; font-size: var(--fs-xs); font-weight: 650; letter-spacing: .05em; text-transform: uppercase; color: var(--texto-tenue); padding: 6px 10px; border-bottom: 1px solid var(--borde-suave); white-space: nowrap; }
+.dup-filas td { padding: 5px 10px; border-top: 1px solid var(--borde-suave); vertical-align: middle; overflow: hidden; }
+.dup-filas tbody tr:first-child td { border-top: 0; }
+/* las columnas están alineadas igual en todos los grupos: el encabezado va solo en el primero */
+.box-list > .dup-grupo ~ .dup-grupo .dup-filas thead { display: none; }
+.dup-filas tr.keep td { background: var(--ok-suave); }
+.dup-filas tr.sobra td:not(.dup-acciones) { opacity: .78; }
+.dup-archivo { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.dup-filas td.dup-archivo { display: table-cell; }
+.dup-archivo > * { display: block; }
+.dup-letra { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 6px; background: var(--superficie-3); font-weight: 700; font-size: 12px; }
+.dup-filas tr.keep .dup-letra { background: var(--ok); color: #04130c; }
+.dup-acciones { text-align: right; white-space: nowrap; }
+.dup-acciones .btn { margin-left: 4px; }
+.dup-queda { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; color: var(--ok); font-weight: 650; font-size: var(--fs-sm); }
+
+[data-estilo="historieta"] .dup-filas th { background: #000; color: var(--crema); font: 400 13px/1 var(--font-titulo); letter-spacing: .06em; padding: 8px 10px; }
+[data-estilo="historieta"] .dup-filas td { border-top: 1.5px dashed rgba(246, 234, 211, .1); }
+[data-estilo="historieta"] .dup-letra { border: 2px solid #000; box-shadow: 2px 2px 0 #000; font-family: var(--font-titulo); font-weight: 400; font-size: 14px; }
+
+/* Bandeja: una fila por archivo (qué llegó · qué tenés y por qué · acciones), dos renglones como mucho */
+.bj-tabla { border: 1px solid var(--borde); border-radius: var(--r-lg); overflow: hidden; background: var(--superficie); margin: var(--sp-2) 0 var(--sp-4); }
+.bj-fila { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 300px; gap: 14px; align-items: center; padding: 6px 14px; min-height: 50px; border-top: 1px solid var(--borde-suave); }
+.bj-fila:first-child { border-top: 0; }
+.bj-fila:hover:not(.bj-cab) { background: var(--hover); }
+.bj-cab { min-height: 0; padding: 7px 14px; background: var(--superficie-2); font-size: var(--fs-xs); font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
+.bj-col { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.bj-col .pill { margin-left: 0; }
+.bj-acciones { display: flex; gap: 4px; justify-content: flex-end; white-space: nowrap; }
+[data-estilo="historieta"] .bj-tabla { border: 2.5px solid var(--tinta); border-radius: 8px; box-shadow: var(--sombra-dura); }
+[data-estilo="historieta"] .bj-fila { border-top: 1.5px dashed rgba(246, 234, 211, .1); }
+[data-estilo="historieta"] .bj-fila:first-child { border-top: 0; }
+[data-estilo="historieta"] .bj-cab { background: #000; color: var(--crema); font: 400 13.5px/1 var(--font-titulo); letter-spacing: .06em; }
+
+/* Pie de la barra lateral (27/10/2026): un solo renglón de íconos con su nombre al pasar el mouse (antes ocupaba 346 px). */
+.side-iconos { display: flex; align-items: center; justify-content: space-between; gap: 2px; }
+.side-ico-btn { position: relative; display: inline-flex; align-items: center; gap: 5px; height: 30px; min-width: 30px; padding: 0 7px; justify-content: center; background: none; border: 0; border-radius: var(--r-md); color: #c5cbd3; cursor: pointer; }
+.side-ico-btn:hover { background: var(--hover); color: var(--text); }
+.side-ico-btn.on { background: var(--accent-soft); color: var(--accent); }
+.side-ico-btn[aria-disabled="true"] { opacity: .55; cursor: default; }
+.side-ico-btn .count { font-size: var(--fs-xs); }
+.side-ico-btn.disc .status { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; }
+.side-sep { flex: none; width: 1px; height: 18px; background: var(--line); margin: 0 2px; }
+/* playlists en la barra: unas pocas y «Ver todas»; al arrastrar temas se ven todas, en una caja que se desplaza */
+.side-vertodas { color: var(--muted); }
+.side-vertodas .side-label { flex: 1; }
+.side-pl-todas { max-height: 46vh; overflow-y: auto; border: 1px dashed var(--accent); border-radius: var(--r-md); padding: 2px; margin: 2px 0; }
+
+/* Pantalla Playlists: las tapas de todas, con buscar y ordenar */
+.pls-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: var(--sp-3) 0 var(--sp-4); }
+.pls-barra input[type="search"] { min-width: 260px; }
+.pls-ruta { display: flex; align-items: center; gap: 6px; margin-bottom: var(--sp-3); }
+.pls-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 16px; }
+.pls-grilla .tarjeta.drop .tarjeta-tapa { outline: 2px dashed var(--accent); outline-offset: 2px; }
+.pls-grilla .tarjeta-tapa .mosaico, .pls-grilla .tarjeta-tapa .sin-tapa, .pls-carpeta { width: 100%; height: 100%; }
+.pls-carpeta { display: flex; align-items: center; justify-content: center; background: var(--panel-2); color: var(--muted); }
+.pls-fijar, .pls-mas { position: absolute; top: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #fff; cursor: pointer; font-size: 14px; line-height: 1; opacity: 0; }
+.pls-fijar { left: 6px; } .pls-mas { right: 6px; }
+.tarjeta:hover .pls-fijar, .tarjeta:hover .pls-mas, .pls-fijar.on, .pls-fijar:focus-visible, .pls-mas:focus-visible { opacity: 1; }
+.pls-fijar.on { color: var(--accent); background: #fff; }
+.wl-incluir { margin: 0 0 var(--sp-3); }
+/* Faltan o suenan mal (27/10): acciones y filtros en dos filas juntas; "Qué incluir" se abre debajo, a todo el ancho */
+.wl-acciones { margin-bottom: var(--sp-2); }
+.wl-filtros { margin-top: 0; }
+.wl-filtros .wl-incluir { margin: 0; }
+.wl-filtros .wl-incluir summary { margin: 0; }
+.wl-filtros .wl-incluir[open] { flex-basis: 100%; order: 9; }
+.wl-filtros .wl-incluir[open] summary { margin-bottom: var(--sp-2); }
+.wl-filtros .wl-incluir > .row { margin: var(--sp-1) 0; }
+.tabs-info { align-self: center; margin-left: var(--sp-2); }
+.wl-incluir summary { cursor: pointer; color: var(--muted); font-size: var(--fs-sm); margin-bottom: var(--sp-2); }
+.t-leyenda { margin: 2px 0 8px; max-width: 60ch; line-height: 1.35; }
+.tidy-siguiente { margin: var(--sp-3) 0 0; }
+
+/* El pie de la barra lateral (SidePie.tsx): Historial, Papelera y Configuración con su nombre, y tus discos en renglones */
+.side-pie-btn { flex: 1 1 0; min-width: 0; flex-direction: column; height: auto; padding: 6px 2px 5px; gap: 3px; }
+.side-pie-label { font-size: 11px; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-pie-btn .count { position: absolute; top: 3px; left: calc(50% + 11px); font-size: 10px; white-space: nowrap; }
+.pie-discos { position: relative; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.pie-rotulo { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--texto-suave); padding: 0 8px 4px; }
+.pie-disco { display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 8px; background: none; border: 0; border-radius: var(--r-md); color: #c5cbd3; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.pie-disco:hover, .pie-disco.on { background: var(--hover); color: var(--text); }
+.pie-disco.off { opacity: .6; }
+.pie-disco-nombre { flex: 1; min-width: 0; }
+.pie-disco-letra { font-size: 11px; color: var(--texto-suave); }
+.pie-agregar { color: var(--texto-suave); font-size: 12px; }
+.pie-menu { position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); z-index: 30; display: flex; flex-direction: column; gap: 6px; padding: 12px; background: var(--panel); border: 1px solid var(--borde-fuerte, var(--line)); border-radius: var(--r-md); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+.pie-menu-ruta { color: var(--texto-suave); overflow-wrap: anywhere; }
+.pie-menu-acciones { display: flex; flex-direction: column; align-items: stretch; gap: 4px; margin-top: 4px; }
+.pie-menu-acciones .btn { justify-content: flex-start; }
+.side-pie-btn[data-page="settings"] { flex-grow: 1.45; }

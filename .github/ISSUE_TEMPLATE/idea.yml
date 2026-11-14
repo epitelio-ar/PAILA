@@ -1,0 +1,31 @@
+name: "Una idea · An idea"
+description: "Algo que te gustaría que PAILA o NAPIA hagan · Something you'd like PAILA or NAPIA to do"
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: "Podés escribir en castellano o en inglés. No hace falta saber programar. · You can write in Spanish or English. No programming needed."
+  - type: textarea
+    id: problema
+    attributes:
+      label: "Qué te pasa hoy · What happens today"
+      description: "El problema, con un ejemplo de tu biblioteca si sirve (sin nombres que no quieras mostrar) · The problem, with an example from your library if it helps (no names you don't want to show)"
+      placeholder: "Tengo 3 copias de cada disco en distintos pendrives y no sé cuál quedarme · I have 3 copies of every album on different USB sticks and don't know which to keep"
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: "Qué te gustaría · What you'd like"
+    validations:
+      required: true
+  - type: dropdown
+    id: para
+    attributes:
+      label: "¿Para qué es? · What's it for?"
+      options: ["Ordenar mi música · Tidying my music", "Calidad · Quality", "Hacer lugar · Freeing up space", "Playlists", "Para DJs o producción · For DJs or production", "NAPIA", "Otra cosa · Something else"]
+  - type: textarea
+    id: otros
+    attributes:
+      label: "¿Otro programa ya lo hace? · Does another program already do it?"
+      description: "Opcional · Optional"

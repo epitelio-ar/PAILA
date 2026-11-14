@@ -1,0 +1,69 @@
+/* La identidad del salto estético (22/10, docs/archivo/diseno/salto-mezcla.md) aplicada a las piezas comunes de todas las pantallas
+   de PAILA y NAPIA: rótulos angostos tipo consola, números en letra fija, cifras grandes con la letra de la plaqueta,
+   cajas y tablas con el mismo borde y la misma trama suave. Solo aspecto: no cambia qué hace ninguna pantalla. */
+
+/* rótulos de sección y encabezados de tabla: angostos, espaciados, en mayúsculas */
+.page h4, .home h3, .box-head h4, .atajos h4, .player-pop h4, .pq-inline h4,
+.req-table th, .mb-head, table.simple th, .review-row.head, .changes-table th {
+  font-family: var(--font-rotulo); font-stretch: 75%; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--texto-suave);
+}
+.page h4 { font-size: 11px; }
+.req-table th, .mb-head, table.simple th, .changes-table th { font-size: 10.5px; }
+
+/* cajas: misma superficie, borde y radio; lisas, sin trama (la trama es solo del fondo) */
+.box, .tile, .card, .callout, .grupos-problemas, .mb-table, .tidy-profile, .tidy-hand, .cover-card, .purge, .casilla {
+  border-radius: var(--r-md);
+}
+.box-head { background: var(--superficie-2); }
+.box-head b, .box-head strong { font-weight: 650; }
+.card:hover:not(:disabled), .tidy-profile:hover:not(:disabled), .casilla:hover:not(.off) { border-color: var(--acento-linea); }
+
+/* cifras grandes (tarjetas, Tu colección, Análisis, NAPIA): la letra de la plaqueta */
+.card-n, .card-n.num, .stat-big, .stat-big.num, .cifra b, .cifra b.num {
+  font-family: var(--font-titulo); font-weight: 400; letter-spacing: .02em; line-height: 1.05;
+}
+.card-n { font-size: 34px; }
+.stat-big { font-size: 34px; }
+
+/* números en columnas: letra fija */
+.num, .count, .tab-count, .req-table td.num, .gbar span, .hist-row .num { font-family: var(--font-mono); letter-spacing: -.02em; }
+
+/* pestañas: rótulo angosto */
+.tab { font-family: var(--font-rotulo); font-stretch: 85%; letter-spacing: .04em; }
+.tab.on { font-weight: 700; }
+
+/* subtítulo de pantalla un poco más tenue y corto, para que mande el título */
+.cabecera-sub { color: var(--texto-suave); }
+.cabecera-2 { margin-bottom: var(--sp-1); }
+
+/* filas de tablas de las pantallas: mismo alto y hover que la tabla de temas */
+.req-table td, table.simple td { border-bottom-color: #191c22; }
+.req-table tr:hover td, .hist-row:hover, .recent li:hover { background: var(--encima); }
+
+/* avisos y pistas: borde izquierdo más grueso, como etiqueta pegada */
+.hint, .purge { border-left-width: 4px; }
+
+/* modo cabina: cifras y rótulos un poco más grandes */
+[data-cabina] .card-n, [data-cabina] .stat-big { font-size: 40px; }
+[data-cabina] .page h4 { font-size: 13px; }
+
+/* banda de arriba de cada pantalla: la trama de puntos detrás del título, que se desvanece hacia abajo */
+.page { position: relative; isolation: isolate; }
+.page::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 150px; z-index: -1; pointer-events: none;
+  background: var(--trama), linear-gradient(var(--superficie), transparent);
+  -webkit-mask: linear-gradient(#000 40%, transparent); mask: linear-gradient(#000 40%, transparent); }
+
+/* subtítulos de sección dentro de una pantalla (Cabecera nivel 3 y los h3 sueltos): misma letra, más chica */
+.cabecera-3 h3, .page > h3, .page > section > h3 { font-family: var(--font-titulo); font-weight: 400; font-size: 21px; letter-spacing: .03em; text-transform: uppercase; color: var(--crema); line-height: 1.1; }
+[data-cabina] .cabecera-3 h3, [data-cabina] .page > h3 { font-size: 24px; }
+
+/* pasos numerados (NAPIA y los recorridos de PAILA): el número como plaqueta, el título con la letra de la figurita */
+.paso-cab { border-radius: var(--r-md) var(--r-md) 0 0; }
+.paso-n { width: 30px; height: 30px; border-radius: 6px; border: 2px solid #000; box-shadow: 2px 2px 0 #000; background: var(--acento); color: var(--acento-texto);
+  font: 18px/1 var(--font-titulo); transform: rotate(-4deg); }
+.paso.hecho .paso-n { background: var(--ok); color: #06140b; border-color: #000; }
+.paso-cab h3 { font-family: var(--font-titulo); font-weight: 400; font-size: 22px; letter-spacing: .03em; text-transform: uppercase; color: var(--crema); }
+.paso-cuerpo { padding-left: calc(var(--sp-4) + 30px + var(--sp-3)); }
+.zona-soltar { background: transparent; }
+.fila-estado .fe-titulo { font-weight: 600; }
+[data-cabina] .paso-cab h3 { font-size: 26px; }

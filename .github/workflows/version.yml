@@ -1,0 +1,304 @@
+# Armar una versión de PAILA (con NAPIA adentro) para repartir (MASTERPLAN-3, punto 10): en Windows, el instalador y la
+# portable, firmados con SignPath Foundation (gratis para proyectos de código abierto, que solo firma lo armado acá); en Mac,
+# los dos .dmg (Apple Silicon e Intel), sin firma; y el código fuente de los programas GPL que viajan con la app. Todo queda
+# como borrador en GitHub Releases. Cómo se lanza, qué secretos cargar y qué tiene que dar: docs/compartir.md, sección 5.
+# - Corre solo a mano (Actions → "Armar versión" → Run workflow); el disparo por etiqueta v* está comentado abajo.
+# - Lo que no está en el repositorio se consigue acá, siempre de una versión fija: Beat This! (Hugging Face, revisado con su
+#   huella), el sockseek con freno (se compila con .NET 10), mpv (revisado con su huella) y las claves (secretos de GitHub).
+# - La firma se saltea mientras no exista la variable SIGNPATH_ORGANIZATION_ID; las claves, mientras no haya secretos.
+# - El borrador se crea solo si se pide (entrada "publicar"); publicarlo de verdad se hace a mano.
+#
+# Por qué Windows va en dos vueltas: el instalador NSIS lleva PAILA.exe adentro, y SignPath no firma lo que está dentro de un
+# NSIS. Entonces 1) se arma la carpeta del programa y se firma PAILA.exe; 2) con esa carpeta firmada se arman el instalador y
+# la portable, y se firman los dos; 3) se rehace latest.yml con la huella de lo firmado (si no, la actualización lo rechaza).
+name: Armar versión
+
+on:
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: 'Crear el borrador de la versión en GitHub Releases'
+        type: boolean
+        default: false
+      mac:
+        description: 'Armar también los .dmg de Mac'
+        type: boolean
+        default: true
+  # push:
+  #   tags: ['v*']
+
+permissions:
+  contents: write      # solo para crear el borrador de la versión
+  actions: read        # SignPath baja los archivos subidos con upload-artifact
+
+concurrency:
+  group: version-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FIRMA: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+
+jobs:
+  windows:
+    name: Windows (instalador y portable) y código fuente GPL
+    runs-on: windows-latest
+    timeout-minutes: 75
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npx install-electron
+
+      - name: Versión
+        id: v
+        shell: pwsh
+        run: |
+          $v = (Get-Content apps/paila/package.json -Raw | ConvertFrom-Json).version
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      # antes de los tests: así usan el ffprobe que viaja, y los de la salida bit perfect usan mpv de verdad (salida nula)
+      - name: ffprobe y mpv (versiones fijas, revisadas con su huella)
+        run: |
+          npm run ffprobe:bajar
+          npm run mpv:bajar
+
+      # Lo mismo que la revisión de cada cambio: si algo falla, no se arma nada.
+      - name: Tipos y tests (incluye licencias al día)
+        run: |
+          npx tsc --noEmit -p tsconfig.json
+          npm test
+
+      # Lo que tarda en conseguirse queda guardado entre corridas (la misma llave que el armado para Mac).
+      - name: Beat This! (guardado entre corridas)
+        id: modelos
+        uses: actions/cache/restore@v4
+        with:
+          path: apps/paila/recursos/modelos
+          key: beat-this-25308706-ort-1.30.0
+
+      - name: Bajar Beat This! (Hugging Face, revisado con su huella)
+        if: steps.modelos.outputs.cache-hit != 'true'
+        run: npm run modelos:armar -- --bajar
+
+      - name: Guardar Beat This! para la próxima
+        if: steps.modelos.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: apps/paila/recursos/modelos
+          key: beat-this-25308706-ort-1.30.0
+
+      - name: sockseek con freno (guardado entre corridas)
+        id: sockseek
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/ss/publicado
+          key: sockseek-win-${{ hashFiles('apps/napia/sockseek-freno/freno.patch', 'apps/napia/sockseek-freno/armar.ps1') }}
+
+      - name: .NET 10 (para armar sockseek)
+        if: steps.sockseek.outputs.cache-hit != 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # en una carpeta de ruta corta: con más de 260 caracteres el armado de .NET falla
+      - name: Armar sockseek con freno
+        if: steps.sockseek.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./apps/napia/sockseek-freno/armar.ps1 -Trabajo "$env:RUNNER_TEMP\ss"
+
+      - name: Guardar sockseek para la próxima
+        if: steps.sockseek.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/ss/publicado
+          key: sockseek-win-${{ hashFiles('apps/napia/sockseek-freno/freno.patch', 'apps/napia/sockseek-freno/armar.ps1') }}
+
+      # revisa que sea el del freno ("-napia" en la versión) y lo deja en apps/napia/recursos/sockseek
+      - name: Poner sockseek en su lugar
+        shell: pwsh
+        run: npm run sockseek:freno -- --desde "$env:RUNNER_TEMP\ss\publicado\sockseek.exe"
+
+      # Sin secretos no escribe nada y PAILA se arma sin claves (cada uno pone las suyas en Configuración).
+      - name: Claves de aplicación (secretos de GitHub)
+        env:
+          DISCOGS_KEY: ${{ secrets.DISCOGS_KEY }}
+          DISCOGS_SECRET: ${{ secrets.DISCOGS_SECRET }}
+          ACOUSTID: ${{ secrets.ACOUSTID }}
+          LASTFM: ${{ secrets.LASTFM }}
+        run: node scripts/claves-ci.mjs
+
+      # 1) La carpeta del programa (dist/win-unpacked), sin instalador todavía.
+      - name: Armar la carpeta del programa
+        run: npm run pack
+
+      # ¿Arranca? Lo que viaja adentro anda y la ventana se dibuja (captura con la ventana oculta, datos en una carpeta vacía).
+      - name: Probar la carpeta armada
+        shell: pwsh
+        run: |
+          $R = 'apps/paila/dist/win-unpacked/resources'
+          & "$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg.exe" -hide_banner -version | Select-Object -First 1
+          & "$R/ffprobe/ffprobe.exe" -hide_banner -version | Select-Object -First 1
+          if (Test-Path "$R/app.asar.unpacked/node_modules/ffprobe-static/bin/win32") { throw 'Viaja el ffprobe viejo de ffprobe-static' }
+          & "$R/mpv/mpv.exe" --no-config --version | Select-Object -First 1
+          & "$R/napia/recursos/sockseek/sockseek.exe" --version
+          Get-ChildItem "$R/modelos/beat-this", 'apps/paila/dist/win-unpacked/AVISOS-DE-TERCEROS.txt' | Format-Table Name, Length
+          New-Item -ItemType Directory -Force capturas-win | Out-Null
+          foreach ($cual in 'paila', 'napia') {
+            $env:PAILA_USER_DATA = "$env:RUNNER_TEMP\datos-$cual"; $env:NAPIA_USER_DATA = "$env:RUNNER_TEMP\datos-$cual"
+            $env:PAILA_SNAPSHOT = "$PWD\capturas-win\$cual.png"; $env:NAPIA_SNAPSHOT = $env:PAILA_SNAPSHOT
+            $a = @{ FilePath = 'apps/paila/dist/win-unpacked/PAILA.exe'; PassThru = $true }
+            if ($cual -eq 'napia') { $a.ArgumentList = '--napia' }
+            $p = Start-Process @a
+            if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force }
+            if (-not (Test-Path $env:PAILA_SNAPSHOT)) { "::warning::$cual no dejó su captura: revisar si arranca" }
+          }
+          Get-ChildItem capturas-win | Format-Table Name, Length
+
+      - name: Guardar las capturas
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-win
+          path: capturas-win
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Subir la carpeta para firmar PAILA.exe
+        if: env.FIRMA == 'true'
+        id: sin-firmar-programa
+        uses: actions/upload-artifact@v4
+        with:
+          name: programa-sin-firmar
+          path: apps/paila/dist/win-unpacked
+          if-no-files-found: error
+
+      - name: Firmar PAILA.exe (SignPath)
+        if: env.FIRMA == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: PAILA
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY || 'release-signing' }}
+          artifact-configuration-slug: programa
+          github-artifact-id: ${{ steps.sin-firmar-programa.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: apps/paila/dist/win-unpacked
+
+      # 2) Instalador y portable a partir de la carpeta (firmada o no).
+      - name: Armar instalador y portable
+        working-directory: apps/paila
+        run: npx electron-builder --win --prepackaged dist/win-unpacked --publish never
+
+      - name: Juntar lo que se reparte
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force salida | Out-Null
+          Copy-Item apps/paila/dist/*.exe, apps/paila/dist/latest.yml salida/
+
+      - name: Subir instalador y portable para firmar
+        if: env.FIRMA == 'true'
+        id: sin-firmar-instaladores
+        uses: actions/upload-artifact@v4
+        with:
+          name: instaladores-sin-firmar
+          path: salida/*.exe
+          if-no-files-found: error
+
+      - name: Firmar instalador y portable (SignPath)
+        if: env.FIRMA == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: PAILA
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY || 'release-signing' }}
+          artifact-configuration-slug: instaladores
+          github-artifact-id: ${{ steps.sin-firmar-instaladores.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: salida
+
+      # 3) La huella de latest.yml tiene que ser la del instalador que se reparte.
+      - name: Rehacer latest.yml
+        run: node scripts/run-ts.mjs scripts/version-firmada.ts salida
+
+      - name: Guardar lo armado
+        uses: actions/upload-artifact@v4
+        with:
+          name: PAILA-${{ steps.v.outputs.version }}${{ env.FIRMA != 'true' && '-sin-firmar' || '' }}
+          path: salida
+          compression-level: 0
+          if-no-files-found: error
+
+      # La GPL pide dar el código fuente de ffmpeg, ffprobe, mpv y el sockseek con freno: se sube con cada versión.
+      - name: Código fuente de los programas GPL
+        run: node scripts/fuentes-gpl.mjs codigo-fuente
+
+      - name: Guardar el código fuente
+        uses: actions/upload-artifact@v4
+        with:
+          name: codigo-fuente-gpl
+          path: codigo-fuente
+          compression-level: 0
+          if-no-files-found: error
+
+  # Los .dmg salen del mismo armado que se prueba en Mac (mac.yml), así no hay dos recetas.
+  mac:
+    name: Mac (.dmg Apple Silicon e Intel, sin firma)
+    if: inputs.mac
+    uses: ./.github/workflows/mac.yml
+    with:
+      armar: true
+
+  # El borrador queda en Releases sin publicar: se revisa, se le escribe la nota y se publica a mano.
+  borrador:
+    name: Borrador de la versión
+    needs: [windows, mac]
+    if: ${{ !cancelled() && inputs.publicar && needs.windows.result == 'success' && (needs.mac.result == 'success' || needs.mac.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # con "Required reviewers" en Settings → Environments → publicar, el borrador espera el OK del dueño del repositorio
+    # antes de crearlo; si el entorno no tiene reglas, GitHub lo crea solo y no frena
+    environment: publicar
+    steps:
+      # para la nota de la versión (docs/NOVEDADES*.md y scripts/notas-version.mjs)
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      # solo lo que se reparte (PAILA-<versión> y PAILA-mac-sin-firmar) y el código fuente; no lo de firmar ni las capturas
+      - name: Bajar lo armado
+        uses: actions/download-artifact@v4
+        with:
+          pattern: PAILA-*
+          path: armado
+
+      - name: Bajar el código fuente
+        uses: actions/download-artifact@v4
+        with:
+          name: codigo-fuente-gpl
+          path: armado/codigo-fuente-gpl
+
+      - name: Crear el borrador
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ needs.windows.outputs.version }}
+        run: |
+          ls -lR armado
+          archivos=(armado/PAILA-"$V"*/* armado/codigo-fuente-gpl/*)
+          if [ -d armado/PAILA-mac-sin-firmar ]; then archivos+=(armado/PAILA-mac-sin-firmar/*.dmg); fi
+          # la huella SHA-256 de cada archivo que se reparte, para quien quiera comprobarlo
+          ( for f in "${archivos[@]}"; do (cd "$(dirname "$f")" && sha256sum "$(basename "$f")"); done ) > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          # la nota sale de docs/NOVEDADES.md y NOVEDADES.en.md; sin la entrada de esta versión, corta
+          node repo/scripts/notas-version.mjs "$V" nota.md
+          gh release create "v$V" "${archivos[@]}" SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --draft --title "PAILA $V" \
+            --notes-file nota.md

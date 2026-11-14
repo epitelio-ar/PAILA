@@ -1,0 +1,151 @@
+/* Estructura de la ventana: barra de arriba, barra lateral, zona central, ficha, reproductor y estado. */
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  grid-template-rows: 54px 46px minmax(0, 1fr) 54px 26px;
+  grid-template-areas: "top top" "tabs tabs" "side main" "player player" "status status";
+}
+.app.with-detail {
+  grid-template-columns: var(--side-w) minmax(0, 1fr) var(--detail-w);
+  grid-template-areas: "top top top" "tabs tabs tabs" "side main detail" "player player player" "status status status";
+}
+
+/* «Saltar al contenido»: escondido hasta que le llega el foco (el primer Tab) */
+.saltar { position: absolute; left: 8px; top: -60px; z-index: 1000; padding: 8px 14px; background: var(--accent); color: #000; font-weight: 700; border: 0; border-radius: var(--r-md); }
+.saltar:focus { top: 8px; }
+.main:focus { outline: none; }
+
+/* ---------- barra de arriba ---------- */
+.top { grid-area: top; display: flex; align-items: center; gap: var(--sp-4); padding: 0 var(--sp-4); background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; width: calc(var(--side-w) - 28px); font-weight: 800; letter-spacing: 4px; color: var(--accent); font-size: 17px; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.brand img { width: 32px; height: 32px; border-radius: 6px; flex: none; }
+.searchbox { position: relative; flex: 1; max-width: 560px; color: var(--muted); }
+.searchbox svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.searchbox input { width: 100%; }
+.scanbox { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.scan-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25; }
+
+/* ---------- pestañas que avanzan (Pestanas.tsx, secciones.ts) ---------- */
+.pestanas { grid-area: tabs; display: flex; align-items: stretch; gap: 2px; padding: 0 var(--sp-3); background: var(--panel); border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.pestana-cont { display: flex; align-items: center; flex: none; }
+.pestana { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 12px; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; cursor: pointer; }
+.pestana:hover { color: var(--text); }
+.pestana.on { color: var(--text); border-bottom-color: var(--accent); }
+.pestana-n { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line-strong, #3a424c); display: grid; place-items: center; font-size: 11px; font-weight: 800; flex: none; }
+.pestana.ok .pestana-n { background: var(--ok); border-color: var(--ok); color: #0b1a10; }
+.pestana.on .pestana-n { background: var(--accent); border-color: var(--accent); color: #121212; }
+.pestana-flecha { color: var(--faint, #66707b); flex: none; }
+.pestana-sep { width: 1px; align-self: center; height: 22px; background: var(--line); margin: 0 var(--sp-2); }
+
+/* ---------- barra lateral ---------- */
+.side-seccion { padding: var(--sp-2) 0; }
+.side-seccion-titulo { font-weight: 800; font-size: 15px; padding: 0 10px; }
+.side-seccion-ayuda { color: var(--muted); font-size: 12.5px; line-height: 1.4; padding: 2px 10px var(--sp-3); margin: 0; }
+.side-num { width: 20px; height: 20px; flex: none; border-radius: 50%; border: 2px solid var(--line-strong, #3a424c); display: grid; place-items: center; font-size: 11px; font-weight: 800; color: var(--muted); }
+.side-item.on .side-num { border-color: currentColor; color: inherit; }
+.side { grid-area: side; display: flex; flex-direction: column; min-height: 0; background: var(--panel); border-right: 1px solid var(--line); }
+/* Fondo sólido propio: sin él Chromium no puede mover la lista entera al scrollear y redibuja a pedazos, y dejaba los
+   títulos de sección (Biblioteca, Playlists, Ordenar…) "pegados" en el lugar viejo, encimados con lo que pasaba abajo. */
+.side-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: var(--sp-2) var(--sp-2) var(--sp-3); background: var(--panel); }
+.side-group { margin-top: var(--sp-2); }
+.side-group-head { display: flex; align-items: center; }
+.side-group-head .side-group-title { flex: 1; }
+.side-mini-tools { display: flex; gap: 2px; }
+.mini-btn { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 22px; background: none; border: 0; border-radius: var(--r-sm); color: var(--faint); cursor: pointer; }
+.mini-btn:hover { background: var(--panel-3); color: var(--text); }
+.side-group-title {
+  display: flex; align-items: center; gap: 4px; width: 100%; padding: 4px 8px; background: none; border: 0; cursor: pointer;
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--faint); text-align: left;
+}
+.side-group-title:hover { color: var(--muted); }
+/* La flecha abierta es otro ícono (no la misma girada con transform): menos capas para el redibujado del scroll. */
+.side-group-title svg { flex: none; }
+.side-item {
+  display: flex; align-items: center; gap: 9px; width: 100%; min-height: 26px; padding: 3px 10px; background: none; border: 0; border-radius: var(--r-md);
+  cursor: pointer; text-align: left; color: #c5cbd3; position: relative;
+}
+.side-item:hover { background: var(--hover); color: var(--text); }
+.side-item.on { background: var(--accent-soft); color: var(--text); font-weight: 650; }
+.side-item.on::before { content: ""; position: absolute; left: -8px; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.side-item .side-ico { flex: none; opacity: .8; }
+.side-item.on .side-ico { color: var(--accent); opacity: 1; }
+.side-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-item .dot { margin-right: 0; }
+.count { color: var(--faint); font-variant-numeric: tabular-nums; font-size: var(--fs-sm); font-weight: 400; }
+.side-item.on .count { color: var(--muted); }
+.side-hint { padding: 2px 10px 4px; line-height: 1.35; font-size: var(--fs-xs); }
+.pl-new { padding: 4px 6px 6px; display: flex; flex-direction: column; gap: 4px; }
+.pl-new input { width: 100%; }
+.pl-item.drop { outline: 2px dashed var(--accent); outline-offset: -2px; background: var(--accent-soft); }
+.pl-icon { opacity: .85; flex: none; }
+
+
+.side-foot { border-top: 1px solid var(--line); padding: var(--sp-2); background: var(--panel); }
+/* Ventana baja (pantallas al 150 % o más, o una laptop): la parte de abajo fija se comía casi toda la altura y arriba quedaba un
+   cuadradito con scroll de cinco renglones (la Biblioteca ni se veía). Ahí la barra entera scrollea junta. */
+@media (max-height: 760px) {
+  .side { overflow-y: auto; overflow-x: hidden; }
+  .side-scroll { flex: none; overflow: visible; }
+}
+.status { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.status.ok { background: var(--ok); }
+.status.off { background: var(--k-excluir); }
+
+/* ---------- zona central ---------- */
+.main { grid-area: main; display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg); }
+.filter-bar { padding: 8px var(--sp-4); background: var(--panel-2); border-bottom: 1px solid var(--line); font-size: var(--fs-sm); display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.filter-bar .link { margin-left: auto; }
+
+/* páginas de herramientas: mismo encabezado, mismo ancho, mismo ritmo */
+/* Fondo sólido en todo lo que scrollea (ver .side-scroll): si no, Chromium a veces deja pedazos dibujados en el lugar viejo. */
+.page { padding: var(--sp-5) var(--sp-6) var(--sp-6); overflow: auto; height: 100%; background: var(--bg); }
+.page > h2 { font-size: 24px; margin-bottom: var(--sp-2); } 
+.page > h2 + p { max-width: 78ch; color: var(--muted); line-height: 1.6; margin-bottom: var(--sp-3); } 
+.page h4, .home h3 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; margin: var(--sp-5) 0 var(--sp-2); }
+.page .btn.small { margin: 0; }
+
+/* ---------- ficha lateral ---------- */
+.detail { position: relative; grid-area: detail; background: var(--panel); border-left: 1px solid var(--line); overflow: auto; }
+.detail-body { padding: var(--sp-4); }
+.detail-body h3 { font-size: var(--fs-lg); margin-bottom: 2px; padding-right: 24px; }
+.detail-body section { margin-top: var(--sp-4); }
+.detail-body h4 { margin: 0 0 6px; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+.detail-body dl { margin: 6px 0 10px; }
+.detail-body dl > div { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 3px 0; }
+.detail-body dt { color: var(--muted); }
+.detail-body dd { margin: 0; word-break: break-word; }
+.detail-body .missing dd { color: var(--muted); }
+.path-box { background: var(--panel-2); border-radius: var(--r-md); padding: 8px 10px; margin-bottom: var(--sp-3); word-break: break-all; }
+.add-pl { padding: var(--sp-3) var(--sp-4) 0; }
+.add-pl select { width: 100%; }
+
+/* ---------- reproductor y barra de estado ---------- */
+.player { grid-area: player; display: flex; align-items: center; gap: var(--sp-3); padding: 0 var(--sp-4); background: var(--panel); border-top: 1px solid var(--line); }
+.play { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-text); cursor: pointer; font-size: 13px; flex: none; }
+.play:hover:not(:disabled) { background: var(--accent-hover); }
+.play:disabled { opacity: .4; cursor: default; }
+.player-info { width: 34%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: var(--fs-sm); width: 44px; text-align: center; }
+.volume { width: 90px; }
+.statusbar { grid-area: status; display: flex; gap: 8px; align-items: center; padding: 0 var(--sp-4); font-size: var(--fs-sm); background: var(--panel); border-top: 1px solid var(--line); overflow: hidden; white-space: nowrap; color: var(--muted); }
+.statusbar b { color: var(--text); font-weight: 600; }
+.side-foot .disc { display: flex; align-items: center; gap: 7px; padding: 4px 10px; }
+.side-foot .disc-path { flex: 1; min-width: 0; color: #c5cbd3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.player-cover { width: 40px; height: 40px; border-radius: var(--r-sm); object-fit: cover; background: var(--panel-3); flex: none; }
+.side-item .side-ico-atencion, .side-item.on .side-ico-atencion { color: var(--warn); opacity: 1; }
+/* la papelera pasó del tope (papelera.ts): su tamaño en la barra, en color de aviso */
+.side-item .count.count-atencion { color: var(--warn); opacity: 1; }
+/* vistas guardadas (ViewTools.tsx): la cruz para borrar aparece al pasar el mouse; renombrar y confirmar, en el mismo lugar */
+.side-vista .side-x { margin-left: auto; opacity: 0; background: none; border: 0; padding: 2px; color: var(--muted); cursor: pointer; border-radius: var(--r-sm); }
+.side-vista:hover .side-x, .side-vista:focus-within .side-x { opacity: 1; }
+.side-vista .side-x:hover { color: var(--text); background: var(--hover); }
+.side-input { width: calc(100% - 8px); margin: 2px 4px; }
+.side-confirm { cursor: default; flex-wrap: wrap; gap: 4px; }
+
+
+/* "Lo último: …  ayer a las 18:05  [Deshacer]" (ChangesBar): el resumen se corta si es muy largo, el cuándo nunca */
+.changes-head .ultimo-hecho { display: inline-flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
+.changes-head .ultimo-que { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80ch; min-width: 0; }
+.changes-head .ultimo-cuando { white-space: nowrap; flex: none; }

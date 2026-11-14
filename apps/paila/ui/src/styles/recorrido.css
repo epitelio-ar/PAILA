@@ -1,0 +1,22 @@
+/* El recorrido de la primera vez (Recorrido.tsx): lo señalado queda iluminado y el resto en penumbra; la oreja habla en un
+   globo. Sobrio: un panel con la oreja chica. Historieta: globo de cómic con borde de tinta y la letra de los globos. */
+.recorrido { position: fixed; inset: 0; z-index: 900; }
+.rec-velo { position: absolute; inset: 0; background: rgba(0, 0, 0, .62); }
+.rec-luz { position: absolute; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, .62), 0 0 0 3px var(--acento); pointer-events: none; transition: all .25s ease; }
+.rec-globo-caja { position: absolute; width: 470px; display: flex; align-items: flex-end; gap: 10px; animation: fade .2s ease; }
+.rec-oreja { width: 84px; height: auto; flex: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5)); }
+.rec-globo { flex: 1; min-width: 0; background: var(--superficie); border: 1px solid var(--borde-fuerte, var(--borde)); border-radius: 12px; padding: 14px 16px 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .5); }
+.rec-globo .titulo { display: block; font-size: 24px; margin: 4px 0 6px; }
+.rec-globo p { margin: 0 0 12px; line-height: 1.45; }
+.rec-botones { display: flex; align-items: center; gap: 6px; }
+.rec-botones .grow { flex: 1; }
+
+[data-estilo="historieta"] .rec-oreja { width: 104px; transform: rotate(-6deg); filter: drop-shadow(3px 3px 0 #000); }
+[data-estilo="historieta"] .rec-luz { border-radius: 8px; box-shadow: 0 0 0 9999px rgba(10, 7, 5, .7), 0 0 0 3px #000, 0 0 0 6px var(--acento); }
+[data-estilo="historieta"] .rec-globo { position: relative; background: #fff7e6; color: #1b140f; border: 3px solid #000; border-radius: 22px; box-shadow: 5px 5px 0 #000; }
+[data-estilo="historieta"] .rec-globo::before { content: ''; position: absolute; left: -15px; bottom: 26px; width: 20px; height: 20px; background: #fff7e6; border-left: 3px solid #000; border-bottom: 3px solid #000; transform: rotate(45deg) skew(12deg, 12deg); }
+[data-estilo="historieta"] .rec-globo .rotulo { color: #7a5a3a; }
+[data-estilo="historieta"] .rec-globo .titulo { color: #1b140f; -webkit-text-stroke: 0; text-shadow: none; font-size: 28px; }
+[data-estilo="historieta"] .rec-globo p { font: 700 14.5px/1.4 'Comic Sans MS', 'Segoe Print', cursive; }
+[data-estilo="historieta"][data-cabina] .rec-globo p { font-family: var(--font); }
+[data-estilo="historieta"][data-cabina] .rec-oreja { transform: none; }

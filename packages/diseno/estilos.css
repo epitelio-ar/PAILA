@@ -1,0 +1,6 @@
+/* Todo el estilo compartido de la familia PAILA + NAPIA: tokens y componentes. Cada app lo importa con una sola línea. */
+@import './tokens.css';
+@import './componentes.css';
+@import './identidad.css';
+@import './historieta.css';
+@import './muestrario.css';

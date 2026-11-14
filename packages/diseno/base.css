@@ -1,0 +1,31 @@
+/* Base para una app nueva de la familia (la usa NAPIA): reinicio, letra, barras de desplazamiento, ayudas de texto y campos. */
+/* Es la misma base que PAILA tiene en apps/paila/ui/src/styles/base.css (PAILA sigue con la suya hasta pasarse a esta). */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--fondo); color: var(--texto); font: var(--fs-md)/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { margin: 0; font-weight: var(--fw-fuerte); letter-spacing: -0.01em; }
+p { margin: 0; }
+code { background: var(--superficie-3); padding: 1px 6px; border-radius: var(--r-sm); font-size: 0.92em; }
+b, strong { font-weight: var(--fw-fuerte); }
+button { font: inherit; color: inherit; }
+a { color: var(--acento); }
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: var(--r-sm); }
+
+* { scrollbar-width: thin; scrollbar-color: #39414b transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #39414b; border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+
+.muted { color: var(--texto-suave); }
+.small { font-size: var(--fs-sm); }
+.push-right { margin-left: auto; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+
+input, select, textarea { font: inherit; color: var(--texto); background: var(--superficie-2); border: 1px solid var(--borde); border-radius: var(--r-md); padding: 6px 10px; min-width: 0; }
+input::placeholder, textarea::placeholder { color: var(--texto-tenue); }
+input:hover, select:hover, textarea:hover { border-color: var(--borde-fuerte); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--acento-linea); box-shadow: 0 0 0 3px var(--acento-suave); }
+input[type=checkbox], input[type=radio] { padding: 0; accent-color: var(--acento); width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+textarea { resize: vertical; line-height: var(--lh-normal); }
+label { cursor: pointer; }

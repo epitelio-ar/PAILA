@@ -1,0 +1,15 @@
+PAILA y NAPIA
+Copyright (C) 2026 Bllly Shears <epitelio.ar@gmail.com>
+
+Este programa es software libre: podés redistribuirlo y/o modificarlo bajo los términos de la GNU Affero General Public
+License publicada por la Free Software Foundation, ya sea la versión 3 de la Licencia o (a tu elección) cualquier versión
+posterior. Se distribuye con la esperanza de que sea útil, pero SIN NINGUNA GARANTÍA; ni siquiera la garantía implícita de
+COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. El texto completo de la licencia está en LICENSE.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
+License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See LICENSE for the full text.
+
+Los componentes de terceros que viajan con la app tienen sus propias licencias: docs/licencias.md y
+apps/paila/build/AVISOS-DE-TERCEROS.txt. Third-party components bundled with the app keep their own licenses (same files).
