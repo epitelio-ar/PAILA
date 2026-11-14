@@ -2,7 +2,7 @@
 // "Código fuente con cada versión"): FFmpeg (ffmpeg y ffprobe, en Windows y en Mac), mpv (Windows y Mac) y el sockseek con
 // freno de NAPIA. Lo usa el armado de GitHub (.github/workflows/version.yml), que adjunta la carpeta al borrador de la versión.
 // Los tar.xz de ffmpeg.org van revisados con su huella; los de GitHub (codeload) no tienen una huella fija, así que se anota
-// la de lo bajado en SHA256SUMS.txt. Las versiones salen de los mismos lugares que el armado (mpv-bajar.mjs, mpv-mac.mjs),
+// la de lo bajado en SHA256SUMS-codigo-fuente.txt. Las versiones salen de los mismos lugares que el armado (mpv-bajar.mjs, mpv-mac.mjs),
 // así que si se cambia una versión ahí, el código fuente la sigue solo.
 // Uso: node scripts/fuentes-gpl.mjs <carpeta de salida>
 import { createHash } from 'node:crypto'
@@ -36,6 +36,9 @@ export function lista() {
   ]
 }
 
+// Las huellas del código fuente van con su propio nombre: el borrador de la versión ya lleva un SHA256SUMS.txt de todo lo
+// que se reparte, y GitHub no deja subir dos archivos con el mismo nombre (falló así el 14/11).
+export const SUMAS = 'SHA256SUMS-codigo-fuente.txt'
 const sha = (f) => createHash('sha256').update(fs.readFileSync(f)).digest('hex')
 
 async function bajar(url, dest) {
@@ -84,7 +87,7 @@ sockseek-napia-fuente.tar.gz
   El sockseek con freno de NAPIA (versión 3.0.6-napia.2): sockseek 3.0.6 y Soulseek.NET 10.0.2 sin tocar, el parche
   freno.patch que les aplica PAILA, los scripts que lo arman (armar.ps1 en Windows, armar.sh en Mac) y sus licencias.
 
-SHA256SUMS.txt: la huella de cada archivo.
+${SUMAS}: la huella de cada archivo.
 `
 }
 
@@ -107,8 +110,8 @@ async function main() {
   console.log('Armando sockseek-napia-fuente.tar.gz…')
   await sockseek(salida)
   fs.writeFileSync(path.join(salida, 'LEEME-codigo-fuente.txt'), leeme(items).replace(/\n/g, '\r\n'))
-  const sumas = fs.readdirSync(salida).filter((f) => f !== 'SHA256SUMS.txt').sort().map((f) => `${sha(path.join(salida, f))}  ${f}`)
-  fs.writeFileSync(path.join(salida, 'SHA256SUMS.txt'), sumas.join('\n') + '\n')
+  const sumas = fs.readdirSync(salida).filter((f) => f !== SUMAS).sort().map((f) => `${sha(path.join(salida, f))}  ${f}`)
+  fs.writeFileSync(path.join(salida, SUMAS), sumas.join('\n') + '\n')
   const mb = fs.readdirSync(salida).reduce((s, f) => s + fs.statSync(path.join(salida, f)).size, 0) / 1048576
   console.log(`Listo: ${salida} (${sumas.length} archivos, ${mb.toFixed(0)} MB).`)
 }

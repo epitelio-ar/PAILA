@@ -7,7 +7,7 @@ import path from 'node:path'
 // @ts-expect-error el script es .mjs sin tipos
 import { SECRETOS, claves } from '../scripts/claves-ci.mjs'
 // @ts-expect-error el script es .mjs sin tipos
-import { FFMPEG, leeme, lista } from '../scripts/fuentes-gpl.mjs'
+import { FFMPEG, SUMAS, leeme, lista } from '../scripts/fuentes-gpl.mjs'
 // @ts-expect-error el script es .mjs sin tipos
 import { MPV } from '../scripts/mpv-bajar.mjs'
 // @ts-expect-error el script es .mjs sin tipos
@@ -64,6 +64,10 @@ describe('version.yml arma lo de hoy', () => {
     expect(version).toContain('node repo/scripts/notas-version.mjs "$V" nota.md')
     expect(version).toContain('--notes-file nota.md')
     expect(version).toMatch(/^ {4}environment: publicar$/m)
+  })
+  it('las huellas del código fuente no se llaman SHA256SUMS.txt, que ya es el nombre de las del borrador (GitHub rechaza dos iguales)', () => {
+    expect(SUMAS).not.toBe('SHA256SUMS.txt')
+    expect(leeme(lista())).toContain(SUMAS)
   })
 })
 
