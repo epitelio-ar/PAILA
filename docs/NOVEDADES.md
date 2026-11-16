@@ -5,6 +5,12 @@ Qué cambió en cada versión, en pocas palabras. La de arriba es la más nueva.
 <!-- Para sumar una versión: una sección "## X.Y.Z · día/mes/año: título corto" arriba de todo, con puntos simples
      (sin jerga; si hace falta una palabra técnica, explicarla). Después: npm run version:subir -- X.Y.Z -->
 
+## 1.0.1 · 16/11/2026: descarga más fácil y arreglos internos
+
+- **Bajar PAILA es más fácil:** la página de cada versión trae arriba de todo los links directos al instalador, a la versión portable y a la de Mac.
+- **Arreglos internos:** el armado de cada versión quedó más prolijo y las pruebas automáticas que se corren antes de cada versión son más estables. No cambia nada de lo que ves en la app.
+- Sirve también para probar que PAILA se actualiza sola: si tenés la 1.0.0, te la ofrece en Configuración → Actualizaciones.
+
 ## 1.0.0 · 13/11/2026: la primera versión pública
 
 - **PAILA ya es pública y de código abierto** (licencia AGPL-3.0): se baja desde github.com/epitelio-ar/PAILA, y cualquiera puede ver cómo está hecha.

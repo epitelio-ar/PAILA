@@ -299,6 +299,7 @@ jobs:
           ( for f in "${archivos[@]}"; do (cd "$(dirname "$f")" && sha256sum "$(basename "$f")"); done ) > SHA256SUMS.txt
           cat SHA256SUMS.txt
           # la nota sale de docs/NOVEDADES.md y NOVEDADES.en.md; sin la entrada de esta versión, corta
-          node repo/scripts/notas-version.mjs "$V" nota.md
+          # arriba de todo, los links para bajar (solo los archivos que se suben)
+          node repo/scripts/notas-version.mjs "$V" nota.md "${archivos[@]}"
           gh release create "v$V" "${archivos[@]}" SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --draft --title "PAILA $V" \
             --notes-file nota.md

@@ -5,6 +5,12 @@ What changed in each version, in a few words. The newest is at the top. PAILA sh
 <!-- The English version of docs/NOVEDADES.md: every version needs its entry in both files, with the same "## X.Y.Z · day/month/year: title"
      header (the date stays day/month/year). Simple points, no jargon. npm run version:subir checks both. -->
 
+## 1.0.1 · 16/11/2026: easier download and internal fixes
+
+- **Downloading PAILA is easier:** each version's page has the direct links to the installer, the portable version and the Mac version right at the top.
+- **Internal fixes:** the way each version gets built is tidier, and the automatic checks that run before every version are more stable. Nothing changes in what you see in the app.
+- It also helps check that PAILA updates itself: if you have 1.0.0, it offers you this one in Settings → Updates.
+
 ## 1.0.0 · 13/11/2026: the first public version
 
 - **PAILA is now public and open source** (AGPL-3.0 license): you download it from github.com/epitelio-ar/PAILA, and anyone can see how it's made.
