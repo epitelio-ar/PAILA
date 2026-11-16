@@ -1,7 +1,6 @@
 // Tests de la intensidad en la app (electron/intensity.ts) con una batería simulada: Tranqui se pausa a batería y sigue al
 // enchufar (pero no si lo pausó el usuario), A fondo baja a Normal y avisa, y el modo queda guardado.
 import { EventEmitter } from 'node:events'
-import os from 'node:os'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { IntensityInfo } from '@paila/shared/types'
 
@@ -13,7 +12,9 @@ vi.mock('node:child_process', async (orig) => ({ ...(await orig<typeof import('n
 const memoria = vi.hoisted(() => ({ libre: 16e9 }))
 vi.mock('node:os', async (orig) => {
   const real = await orig<typeof import('node:os')>()
-  return { ...real, freemem: () => memoria.libre, default: { ...real, freemem: () => memoria.libre } }
+  // y 8 hilos fijos: con los de la máquina, en un runner de GitHub con menos núcleos el test de "A fondo" cambiaba (Revisión del 16/11)
+  const fijo = { freemem: () => memoria.libre, availableParallelism: () => 8 }
+  return { ...real, ...fijo, default: { ...real, ...fijo } }
 })
 
 const { IntensityControl } = await import('../apps/paila/electron/intensity')
@@ -59,7 +60,7 @@ describe('intensidad con batería', () => {
   })
 
   // con menos de 4 hilos A fondo y Normal piden lo mismo
-  it.skipIf(os.availableParallelism() < 4)('A fondo: a batería baja a Normal y avisa; al enchufar vuelve', () => {
+  it('A fondo: a batería baja a Normal y avisa; al enchufar vuelve', () => {
     const t = setup('fondo')
     const fondo = t.slots.size
     power.battery = true; power.emit('on-battery')

@@ -2,6 +2,6 @@
 # al vencer, la revisión vuelve a marcarla y hay que mirarla de nuevo.
 
 [[IgnoredVulns]]
-id = "GHSA-hp3w-g68c-fv3c"
+id = "GHSA-g3hv-75wg-m249"
 ignoreUntil = 2027-01-20
-reason = "sprintf-js 1.1.3 solo lo usa electron-builder al armar el instalador (vía @electron/get > global-agent > roarr); no viaja con la app y todavía no hay versión arreglada."
+reason = "minimatch 9 y 10 solo los usa electron-builder al armar (app-builder-lib y @electron/universal), con patrones nuestros; no viaja con la app. Forzar la 11 con overrides de npm dejaba la dependencia sin instalar (16/11)."
