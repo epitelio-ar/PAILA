@@ -255,6 +255,7 @@ jobs:
     name: Mac (.dmg Apple Silicon e Intel, sin firma)
     if: inputs.mac
     uses: ./.github/workflows/mac.yml
+    secrets: inherit  # las claves de aplicación (mac.yml corre claves-ci.mjs, como el armado de Windows)
     with:
       armar: true
 

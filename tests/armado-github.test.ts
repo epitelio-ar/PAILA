@@ -51,6 +51,17 @@ describe('version.yml arma lo de hoy', () => {
     expect(version).toContain('uses: ./.github/workflows/mac.yml')
     expect(mac).toMatch(/^ {2}workflow_call:/m)
   })
+  it('los .dmg traen las claves de aplicación, como el armado de Windows (hasta la 1.0.1 salían sin claves)', () => {
+    expect(mac).toContain('node scripts/claves-ci.mjs')
+    for (const s of Object.values(SECRETOS) as string[]) expect(mac).toContain(`${s}: \${{ secrets.${s} }}`)
+    // llamado desde version.yml, mac.yml solo ve los secretos si se los pasan
+    expect(version).toMatch(/uses: \.\/\.github\/workflows\/mac\.yml\n {4}secrets: inherit/)
+  })
+  it('mac.yml deja elegir la Mac (Apple Silicon o Intel) y prueba la app de ese procesador', () => {
+    expect(mac).toContain("runs-on: ${{ inputs.maquina || 'macos-15' }}")
+    expect(mac).toContain('options: [macos-15, macos-15-intel]')
+    expect(mac).toMatch(/if \[ "\$ARCH" = arm64 \]; then A=apps\/paila\/dist\/mac-arm64\/PAILA\.app; else A=apps\/paila\/dist\/mac\/PAILA\.app; fi/)
+  })
   it('el borrador lleva lo de Windows, los .dmg y el código fuente, en el commit armado', () => {
     expect(version).toMatch(/armado\/PAILA-"\$V"\*/)
     expect(version).toContain('PAILA-mac-sin-firmar/*.dmg')

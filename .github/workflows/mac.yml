@@ -13,12 +13,24 @@ on:
         description: 'Armar los .dmg (si no, solo tipos y tests)'
         type: boolean
         default: true
+      maquina:
+        description: 'Mac de GitHub: macos-15 (Apple Silicon) o macos-15-intel (Intel; a veces hay más lugar)'
+        type: choice
+        options: [macos-15, macos-15-intel]
+        default: macos-15
+      ref:
+        description: 'Código a armar (una etiqueta como v1.0.1; vacío = el de esta corrida). Sirve para armar una versión ya publicada con este workflow'
+        type: string
+        default: ''
   # el armado de una versión (version.yml) lo llama para los .dmg que van al borrador
   workflow_call:
     inputs:
       armar:
         type: boolean
         default: true
+      maquina:
+        type: string
+        default: macos-15
   # una rama de prueba subida como mac/<algo> (git push origin HEAD:mac/prueba): así se prueba sin tocar main
   push:
     branches: ['mac/**']
@@ -41,13 +53,16 @@ concurrency:
 jobs:
   mac:
     name: Tipos, tests y .dmg en Mac
-    runs-on: macos-15
+    # las dos Mac arman los dos .dmg (Apple Silicon e Intel); la prueba del final abre el de la Mac que tocó
+    runs-on: ${{ inputs.maquina || 'macos-15' }}
     timeout-minutes: 45
     env:
       # un commit con "[sin armar]" en el mensaje corre solo tipos y tests (ahorra unos 5 minutos de Mac)
       ARMAR: ${{ (github.event_name == 'push' && !contains(github.event.head_commit.message, '[sin armar]')) || inputs.armar }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}  # vacío = el commit de esta corrida
 
       - uses: actions/setup-node@v6
         with:
@@ -67,8 +82,11 @@ jobs:
       - name: mpv para Mac
         if: ${{ !cancelled() }}
         run: |
-          node scripts/mpv-mac.mjs arm64
-          echo "PAILA_MPV=$PWD/apps/paila/recursos/mpv-mac/arm64/mpv.app/Contents/MacOS/mpv" >> "$GITHUB_ENV"
+          # el procesador de esta Mac: arm64 (Apple Silicon) o x64 (Intel)
+          if [ "$(uname -m)" = arm64 ]; then ARCH=arm64; else ARCH=x64; fi
+          echo "ARCH=$ARCH" >> "$GITHUB_ENV"
+          node scripts/mpv-mac.mjs $ARCH
+          echo "PAILA_MPV=$PWD/apps/paila/recursos/mpv-mac/$ARCH/mpv.app/Contents/MacOS/mpv" >> "$GITHUB_ENV"
 
       # aunque algo de arriba falle, los tests corren igual (sin mpv, sus tests de verdad se saltean solos)
       - name: Tests (incluye la regla de estilo)
@@ -123,6 +141,17 @@ jobs:
           path: apps/napia/recursos/sockseek-mac
           key: sockseek-mac-${{ hashFiles('apps/napia/sockseek-freno/freno.patch', 'apps/napia/sockseek-freno/armar.sh') }}
 
+      # Sin secretos no escribe nada y PAILA se arma sin claves (cada uno pone las suyas en Configuración). Lo mismo que en
+      # Windows (version.yml): hasta la 1.0.1 este paso faltaba y los .dmg salían sin claves.
+      - name: Claves de aplicación (secretos de GitHub)
+        if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        env:
+          DISCOGS_KEY: ${{ secrets.DISCOGS_KEY }}
+          DISCOGS_SECRET: ${{ secrets.DISCOGS_SECRET }}
+          ACOUSTID: ${{ secrets.ACOUSTID }}
+          LASTFM: ${{ secrets.LASTFM }}
+        run: node scripts/claves-ci.mjs
+
       - name: Armar los .dmg
         if: ${{ !cancelled() && env.ARMAR == 'true' }}
         run: npm run dist:mac
@@ -131,21 +160,27 @@ jobs:
       - name: Probar la app armada
         if: ${{ !cancelled() && env.ARMAR == 'true' }}
         run: |
-          A=apps/paila/dist/mac-arm64/PAILA.app
+          # la app del procesador de esta Mac (la otra no arranca acá)
+          if [ "$ARCH" = arm64 ]; then A=apps/paila/dist/mac-arm64/PAILA.app; else A=apps/paila/dist/mac/PAILA.app; fi
           R=$A/Contents/Resources
           mkdir -p capturas-mac
           codesign -dv "$A" 2>&1 | grep -E 'Signature|Format' || true
           "$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1
-          "$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/arm64/ffprobe" -hide_banner -version | head -1
+          "$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$ARCH/ffprobe" -hide_banner -version | head -1
           "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | head -1
           "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --ao=coreaudio_exclusive --audio-device=help || true
           "$R/napia/recursos/sockseek/sockseek" --version
           ls "$R/modelos/beat-this" "$R/AVISOS-DE-TERCEROS.txt"
-          # el de Intel: que cada programa sea de ese procesador (y sus versiones, si la Mac tiene Rosetta)
-          X=apps/paila/dist/mac/PAILA.app/Contents/Resources
-          for f in "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" "$X/mpv/mpv.app/Contents/MacOS/mpv" "$X/napia/recursos/sockseek/sockseek" apps/paila/dist/mac/PAILA.app/Contents/MacOS/PAILA; do echo "$(lipo -archs "$f") $f"; done
-          arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1 || true
-          arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | head -1 || true
+          # las dos apps: que cada programa sea de su procesador (y en Apple Silicon, las versiones de Intel si hay Rosetta)
+          for d in mac-arm64:arm64 mac:x64; do
+            X=apps/paila/dist/${d%%:*}/PAILA.app/Contents/Resources
+            for f in "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/${d##*:}/ffprobe" "$X/mpv/mpv.app/Contents/MacOS/mpv" "$X/napia/recursos/sockseek/sockseek" "$X/../MacOS/PAILA"; do echo "$(lipo -archs "$f") $f"; done
+          done
+          if [ "$ARCH" = arm64 ]; then
+            X=apps/paila/dist/mac/PAILA.app/Contents/Resources
+            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1 || true
+            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | head -1 || true
+          fi
           # con tope de 2 minutos cada una (perl: macOS no trae `timeout`)
           tope() { perl -e 'alarm shift; exec @ARGV' 120 "$@"; }
           PAILA_USER_DATA="$RUNNER_TEMP/datos-paila" PAILA_SNAPSHOT="$PWD/capturas-mac/paila.png" tope "$A/Contents/MacOS/PAILA" || true
