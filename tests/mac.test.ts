@@ -13,7 +13,8 @@ import { teclas } from '@paila/shared/teclas'
 import { abrirNapiaLabel, macMenu, type MacMenuItem } from '@paila/shared/menumac'
 import { ponerIdioma, textos, tr } from '@paila/shared/idioma'
 import { buscarApp, mpvMacExe } from '../scripts/mpv-mac.mjs'
-import { archivosMac, comprimir, faltan, sockseekMac } from '../scripts/armar-mac.mjs'
+import { archivoConfigMac, archivosMac, comprimir, configMac, faltan, sockseekMac } from '../scripts/armar-mac.mjs'
+import { createRequire } from 'node:module'
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'paila-mac-'))
 afterAll(() => fs.rmSync(dir, { recursive: true, force: true }))
@@ -143,6 +144,26 @@ describe('armado para Mac', () => {
     expect(mac).toContain('!node_modules/ffprobe-static/bin/win32/**')
     expect(mac).toContain('!node_modules/ffprobe-static/bin/darwin/x64/**')
     expect(mac).not.toContain('!node_modules/ffprobe-static/bin/darwin/**')
+  })
+
+  it('electron-builder arma Mac con la lista de Mac sola, sin la exclusión de ffprobe de Windows (las .dmg 1.0.0 y 1.0.1 salieron sin él)', async () => {
+    const pkg = JSON.parse(fs.readFileSync('apps/paila/package.json', 'utf8')).build
+    const cfg = configMac(pkg, 'x64')
+    expect(cfg.appId).toBe(pkg.appId)
+    expect(cfg.mac).toEqual(pkg.mac)
+    // la configuración que de verdad ve electron-builder (su propio getConfig), leyendo el archivo que le pasa armar-mac
+    const req = createRequire(path.resolve('apps/paila/package.json'))
+    const { getConfig } = req(path.join(path.dirname(req.resolve('app-builder-lib/package.json')), 'out', 'util', 'config', 'config.js'))
+    // electron-builder deja la lista como [{ filter: [...] }]: se aplana para mirarla
+    const lista = (c: { files: unknown[] }) => c.files.flatMap((x) => (typeof x === 'string' ? [x] : (x as { filter: string[] }).filter))
+    const efectiva = await getConfig(path.resolve('apps/paila'), archivoConfigMac('arm64', dir), null)
+    expect(lista(efectiva)).not.toContain('!node_modules/ffprobe-static/bin/darwin/**')
+    expect(lista(efectiva)).toContain('!node_modules/ffprobe-static/bin/darwin/x64/**')
+    expect(lista(efectiva)).toContain('out/**')
+    expect(efectiva.asarUnpack).toContain('node_modules/ffprobe-static/**')
+    // pasada como objeto, electron-builder la sumaba a la de package.json y la exclusión seguía: esto es lo que pasaba
+    const sumada = await getConfig(path.resolve('apps/paila'), null, { files: archivosMac(pkg.files, 'arm64') })
+    expect(lista(sumada)).toContain('!node_modules/ffprobe-static/bin/darwin/**')
   })
 
   it('pasa el .dmg a LZMA (ULMO) en su lugar y saca el .blockmap', () => {

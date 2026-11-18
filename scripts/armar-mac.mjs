@@ -45,7 +45,9 @@ function ffmpegPara(arch) {
  * La lista de archivos de la app para Mac: la de `build.files` (pensada para Windows: deja afuera todos los de ffprobe-static,
  * porque Windows usa el de gyan.dev de recursos/ffprobe) con los de Windows afuera y solo el de Mac de este procesador (el
  * otro son ~70 MB). Va entera y reemplaza a la de arriba: una lista de solo exclusiones en `build.mac.files` haría que
- * electron-builder copie la carpeta entera.
+ * electron-builder copie la carpeta entera. Ojo: pasada como objeto en `build({ config })`, electron-builder la SUMA a la de
+ * package.json (une las listas) y la exclusión de Windows `!…/bin/darwin/**` seguía valiendo: las .dmg de la 1.0.0 y la 1.0.1
+ * salieron sin ffprobe. Por eso va en un archivo de configuración entero (configMac), que reemplaza al "build" de package.json.
  */
 export function archivosMac(files, arch) {
   const otro = ARCHS.find((a) => a !== arch)
@@ -53,9 +55,22 @@ export function archivosMac(files, arch) {
   return [...files.filter((f) => !afuera.includes(f)), '!node_modules/ffprobe-static/bin/win32/**', `!node_modules/ffprobe-static/bin/darwin/${otro}/**`]
 }
 
+/** La configuración entera de electron-builder para ese procesador: el "build" de package.json con la lista de archivos de Mac. */
+export function configMac(build, arch) {
+  return { ...build, files: archivosMac(build.files, arch) }
+}
+
+/** Escribe configMac en un archivo y devuelve su ruta: electron-builder lo lee EN LUGAR del "build" de package.json. */
+export function archivoConfigMac(arch, dir = os.tmpdir()) {
+  const build = JSON.parse(fs.readFileSync(path.join(app, 'package.json'), 'utf8')).build
+  const f = path.join(dir, `paila-electron-builder-mac-${arch}.json`)
+  fs.writeFileSync(f, JSON.stringify(configMac(build, arch), null, 2))
+  return f
+}
+
 async function armar(arch, soloApp) {
   const { build, Platform, Arch } = require('electron-builder')
-  const config = { files: archivosMac(JSON.parse(fs.readFileSync(path.join(app, 'package.json'), 'utf8')).build.files, arch) }
+  const config = archivoConfigMac(arch)
   const hechos = await build({ projectDir: app, targets: Platform.MAC.createTarget(soloApp ? ['dir'] : ['dmg'], Arch[arch]), config, publish: 'never' })
   for (const dmg of hechos.filter((f) => f.endsWith('.dmg'))) comprimir(dmg)
 }

@@ -157,29 +157,41 @@ jobs:
         run: npm run dist:mac
 
       # ¿Arranca? Lo que viaja adentro anda y la ventana se dibuja (captura con la ventana oculta, datos en una carpeta vacía).
+      # Falla si falta algo (bash con pipefail: un `| head -1` ya no tapa el error). Así salieron sin ffprobe la 1.0.0 y la 1.0.1.
       - name: Probar la app armada
         if: ${{ !cancelled() && env.ARMAR == 'true' }}
+        shell: bash --noprofile --norc -euo pipefail {0}
         run: |
           # la app del procesador de esta Mac (la otra no arranca acá)
           if [ "$ARCH" = arm64 ]; then A=apps/paila/dist/mac-arm64/PAILA.app; else A=apps/paila/dist/mac/PAILA.app; fi
           R=$A/Contents/Resources
           mkdir -p capturas-mac
           codesign -dv "$A" 2>&1 | grep -E 'Signature|Format' || true
-          "$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1
-          "$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$ARCH/ffprobe" -hide_banner -version | head -1
-          "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | head -1
+          # en las DOS apps tienen que estar ffmpeg, ffprobe, mpv y sockseek, y ser programas de ese procesador
+          for d in mac-arm64:arm64:arm64 mac:x64:x86_64; do
+            X=apps/paila/dist/${d%%:*}/PAILA.app/Contents/Resources; a=${d#*:}; a=${a%%:*}
+            for f in "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$a/ffprobe" "$X/mpv/mpv.app/Contents/MacOS/mpv" "$X/napia/recursos/sockseek/sockseek" "$X/../MacOS/PAILA"; do
+              [ -x "$f" ] || { echo "::error::Falta en la app de $a: $f"; exit 1; }
+              lipo -archs "$f" | grep -qw "${d##*:}" || { echo "::error::$f no es de $a: $(lipo -archs "$f")"; exit 1; }
+            done
+          done
+          FF="$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg"; FP="$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$ARCH/ffprobe"
+          "$FF" -hide_banner -version | sed -n 1p
+          "$FP" -hide_banner -version | sed -n 1p
+          "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | sed -n 1p
+          # que lea un tema: un MP3 de 3 segundos hecho con el ffmpeg de la app, leído con su ffprobe
+          "$FF" -hide_banner -loglevel error -f lavfi -i sine=frequency=440:duration=3 -c:a libmp3lame -b:a 192k "$RUNNER_TEMP/tema.mp3"
+          DUR=$("$FP" -v error -show_entries format=duration -of csv=p=0 "$RUNNER_TEMP/tema.mp3")
+          echo "ffprobe de la app lee el tema: $DUR s"
+          awk -v d="$DUR" 'BEGIN { exit !(d > 2.5 && d < 3.5) }' || { echo "::error::ffprobe de la app no leyó bien el tema ($DUR)"; exit 1; }
           "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --ao=coreaudio_exclusive --audio-device=help || true
           "$R/napia/recursos/sockseek/sockseek" --version
           ls "$R/modelos/beat-this" "$R/AVISOS-DE-TERCEROS.txt"
-          # las dos apps: que cada programa sea de su procesador (y en Apple Silicon, las versiones de Intel si hay Rosetta)
-          for d in mac-arm64:arm64 mac:x64; do
-            X=apps/paila/dist/${d%%:*}/PAILA.app/Contents/Resources
-            for f in "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/${d##*:}/ffprobe" "$X/mpv/mpv.app/Contents/MacOS/mpv" "$X/napia/recursos/sockseek/sockseek" "$X/../MacOS/PAILA"; do echo "$(lipo -archs "$f") $f"; done
-          done
+          # en Apple Silicon, las versiones de Intel si hay Rosetta (si no hay, no frena)
           if [ "$ARCH" = arm64 ]; then
             X=apps/paila/dist/mac/PAILA.app/Contents/Resources
-            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | head -1 || true
-            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | head -1 || true
+            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | sed -n 1p || true
+            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | sed -n 1p || true
           fi
           # con tope de 2 minutos cada una (perl: macOS no trae `timeout`)
           tope() { perl -e 'alarm shift; exec @ARGV' 120 "$@"; }
