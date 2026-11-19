@@ -17,10 +17,8 @@ const raiz = path.resolve(import.meta.dirname, '..')
 
 /** Las versiones de FFmpeg que viajan con PAILA (AVISOS-DE-TERCEROS, punto 1), con la huella del tar.xz de ffmpeg.org. */
 export const FFMPEG = [
-  { version: '6.1.1', para: 'ffmpeg.exe y ffprobe.exe de Windows (gyan.dev 6.1.1) y ffmpeg de Mac Intel', sha256: '8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968' },
-  { version: '6.0', para: 'ffmpeg de Mac Apple Silicon', sha256: '57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082' },
-  { version: '4.4', para: 'ffprobe de Mac Apple Silicon', sha256: '06b10a183ce5371f915c6bb15b7b1fffbe046e8275099c96affc29e17645d909' },
-  { version: '4.0.2', para: 'ffprobe de Mac Intel (ffprobe-static)', sha256: 'a95c0cc9eb990e94031d2183f2e6e444cc61c99f6f182d1575c433d62afb2f97' },
+  { version: '6.1.1', para: 'ffmpeg.exe y ffprobe.exe de Windows (gyan.dev 6.1.1) y ffmpeg y ffprobe de Mac Intel', sha256: '8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968' },
+  { version: '6.0', para: 'ffmpeg y ffprobe de Mac Apple Silicon', sha256: '57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082' },
 ]
 /** La configuración del armado de gyan.dev (opciones y versión de cada biblioteca): el README que baja ffmpeg-static. */
 const GYAN_README = 'https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-win32-x64.README'

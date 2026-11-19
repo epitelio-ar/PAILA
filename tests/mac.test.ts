@@ -13,7 +13,8 @@ import { teclas } from '@paila/shared/teclas'
 import { abrirNapiaLabel, macMenu, type MacMenuItem } from '@paila/shared/menumac'
 import { ponerIdioma, textos, tr } from '@paila/shared/idioma'
 import { buscarApp, mpvMacExe } from '../scripts/mpv-mac.mjs'
-import { archivoConfigMac, archivosMac, comprimir, configMac, faltan, sockseekMac } from '../scripts/armar-mac.mjs'
+import { FFPROBE_MAC, archivoConfigMac, archivosMac, comprimir, configMac, esFfprobeMac, faltan, sockseekMac, urlFfprobeMac } from '../scripts/armar-mac.mjs'
+import { FFMPEG } from '../scripts/fuentes-gpl.mjs'
 import { createRequire } from 'node:module'
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'paila-mac-'))
@@ -164,6 +165,21 @@ describe('armado para Mac', () => {
     // pasada como objeto, electron-builder la sumaba a la de package.json y la exclusión seguía: esto es lo que pasaba
     const sumada = await getConfig(path.resolve('apps/paila'), null, { files: archivosMac(pkg.files, 'arm64') })
     expect(lista(sumada)).toContain('!node_modules/ffprobe-static/bin/darwin/**')
+  })
+
+  it('ffprobe de Mac: el del mismo armado que ffmpeg (ffmpeg-static b6.1.1), fijado por huella para cada procesador', () => {
+    // el "arm64" de ffprobe-static era de Intel (solo andaba con Rosetta): el del armado de la 1.0.1 frenó por eso
+    expect(urlFfprobeMac('arm64')).toBe('https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffprobe-darwin-arm64')
+    expect(urlFfprobeMac('x64')).toBe('https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffprobe-darwin-x64')
+    for (const a of ['arm64', 'x64'] as const) expect(FFPROBE_MAC[a].sha256).toMatch(/^[0-9a-f]{64}$/)
+    expect(FFPROBE_MAC.arm64.sha256).not.toBe(FFPROBE_MAC.x64.sha256)
+    // la huella manda: un archivo cualquiera no pasa
+    const falso = path.join(dir, 'ffprobe'); fs.writeFileSync(falso, 'no es ffprobe')
+    expect(esFfprobeMac(falso, 'arm64')).toBe(false)
+    expect(esFfprobeMac(path.join(dir, 'no-existe'), 'x64')).toBe(false)
+    // su código fuente va con cada versión
+    const versiones = (FFMPEG as { version: string }[]).map((f) => f.version)
+    for (const a of ['arm64', 'x64'] as const) expect(versiones).toContain(FFPROBE_MAC[a].version)
   })
 
   it('pasa el .dmg a LZMA (ULMO) en su lugar y saca el .blockmap', () => {

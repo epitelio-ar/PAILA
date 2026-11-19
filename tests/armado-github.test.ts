@@ -62,6 +62,13 @@ describe('version.yml arma lo de hoy', () => {
     expect(mac).toContain('options: [macos-15, macos-15-intel]')
     expect(mac).toMatch(/if \[ "\$ARCH" = arm64 \]; then A=apps\/paila\/dist\/mac-arm64\/PAILA\.app; else A=apps\/paila\/dist\/mac\/PAILA\.app; fi/)
   })
+  it('mac.yml revisa el procesador de ffmpeg, ffprobe y mpv en las dos apps y lee un MP3 con cada una (la de Intel, con Rosetta)', () => {
+    expect(mac).toContain('for d in mac-arm64:arm64:arm64 mac:x64:x86_64; do')
+    expect(mac).toContain('lipo -archs "$f" | grep -qw')
+    expect(mac).toContain('leer "$R" "$ARCH"')
+    expect(mac).toContain('leer apps/paila/dist/mac/PAILA.app/Contents/Resources x64 "arch -x86_64"')
+    expect(mac).toContain('shell: bash --noprofile --norc -euo pipefail {0}')
+  })
   it('el borrador lleva lo de Windows, los .dmg y el código fuente, en el commit armado', () => {
     expect(version).toMatch(/armado\/PAILA-"\$V"\*/)
     expect(version).toContain('PAILA-mac-sin-firmar/*.dmg')

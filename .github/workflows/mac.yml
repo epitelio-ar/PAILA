@@ -175,24 +175,27 @@ jobs:
               lipo -archs "$f" | grep -qw "${d##*:}" || { echo "::error::$f no es de $a: $(lipo -archs "$f")"; exit 1; }
             done
           done
-          FF="$R/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg"; FP="$R/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$ARCH/ffprobe"
-          "$FF" -hide_banner -version | sed -n 1p
-          "$FP" -hide_banner -version | sed -n 1p
-          "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | sed -n 1p
-          # que lea un tema: un MP3 de 3 segundos hecho con el ffmpeg de la app, leído con su ffprobe
-          "$FF" -hide_banner -loglevel error -f lavfi -i sine=frequency=440:duration=3 -c:a libmp3lame -b:a 192k "$RUNNER_TEMP/tema.mp3"
-          DUR=$("$FP" -v error -show_entries format=duration -of csv=p=0 "$RUNNER_TEMP/tema.mp3")
-          echo "ffprobe de la app lee el tema: $DUR s"
-          awk -v d="$DUR" 'BEGIN { exit !(d > 2.5 && d < 3.5) }' || { echo "::error::ffprobe de la app no leyó bien el tema ($DUR)"; exit 1; }
+          # que lea un tema, con cada app: un MP3 de 3 segundos hecho con su ffmpeg y leído con su ffprobe. La de esta Mac
+          # siempre; la de Intel en una Apple Silicon solo si hay Rosetta (si no, se prueba eligiendo macos-15-intel)
+          leer() {
+            local X=$1 a=$2 pre=${3:-}
+            local FF="$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" FP="$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/$a/ffprobe"
+            $pre "$FF" -hide_banner -version | sed -n 1p
+            $pre "$FP" -hide_banner -version | sed -n 1p
+            $pre "$X/mpv/mpv.app/Contents/MacOS/mpv" --no-config --version | sed -n 1p
+            $pre "$FF" -hide_banner -loglevel error -y -f lavfi -i sine=frequency=440:duration=3 -c:a libmp3lame -b:a 192k "$RUNNER_TEMP/tema-$a.mp3"
+            local DUR; DUR=$($pre "$FP" -v error -show_entries format=duration -of csv=p=0 "$RUNNER_TEMP/tema-$a.mp3")
+            echo "ffprobe de la app de $a lee el tema: $DUR s"
+            awk -v d="$DUR" 'BEGIN { exit !(d > 2.5 && d < 3.5) }' || { echo "::error::ffprobe de la app de $a no leyó bien el tema ($DUR)"; exit 1; }
+          }
+          leer "$R" "$ARCH"
+          if [ "$ARCH" = arm64 ]; then
+            if arch -x86_64 /usr/bin/true 2>/dev/null; then leer apps/paila/dist/mac/PAILA.app/Contents/Resources x64 "arch -x86_64"
+            else echo "::warning::Esta Mac no tiene Rosetta: la app de Intel no leyó el tema acá (sí se revisó qué trae y de qué procesador es)"; fi
+          fi
           "$R/mpv/mpv.app/Contents/MacOS/mpv" --no-config --ao=coreaudio_exclusive --audio-device=help || true
           "$R/napia/recursos/sockseek/sockseek" --version
           ls "$R/modelos/beat-this" "$R/AVISOS-DE-TERCEROS.txt"
-          # en Apple Silicon, las versiones de Intel si hay Rosetta (si no hay, no frena)
-          if [ "$ARCH" = arm64 ]; then
-            X=apps/paila/dist/mac/PAILA.app/Contents/Resources
-            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -hide_banner -version | sed -n 1p || true
-            arch -x86_64 "$X/app.asar.unpacked/node_modules/ffprobe-static/bin/darwin/x64/ffprobe" -hide_banner -version | sed -n 1p || true
-          fi
           # con tope de 2 minutos cada una (perl: macOS no trae `timeout`)
           tope() { perl -e 'alarm shift; exec @ARGV' 120 "$@"; }
           PAILA_USER_DATA="$RUNNER_TEMP/datos-paila" PAILA_SNAPSHOT="$PWD/capturas-mac/paila.png" tope "$A/Contents/MacOS/PAILA" || true

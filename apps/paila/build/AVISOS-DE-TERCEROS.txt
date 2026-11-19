@@ -32,12 +32,12 @@ ffmpeg.exe (paquete ffmpeg-static, https://github.com/eugeneware/ffmpeg-static):
 ffprobe.exe: del mismo armado que ffmpeg.exe (gyan.dev 6.1.1 "essentials": el mismo código fuente y la misma
   configuración), sacado de ffmpeg-6.1.1-essentials_build.7z (https://github.com/GyanD/codexffmpeg/releases/tag/6.1.1).
 
-En Mac (PAILA para Mac, en prueba): ffmpeg y ffprobe son los armados para macOS de los paquetes ffmpeg-static y
-ffprobe-static (https://github.com/joshwnj/ffprobe-static), también GPL-3.0. Van en PAILA.app/Contents/Resources/app.asar.unpacked/node_modules.
-  Apple Silicon: ffmpeg 6.0 y ffprobe 4.4 (armado de evermeet.cx). Intel: ffmpeg 6.1.1 (armado de evermeet.cx) y ffprobe
-  4.0.2 (armado de Zeranoe, 2018). Código fuente de FFmpeg 6.0, 4.4 y 4.0.2: https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz,
-  https://ffmpeg.org/releases/ffmpeg-4.4.tar.xz y https://ffmpeg.org/releases/ffmpeg-4.0.2.tar.xz (la 6.1.1, arriba).
-  Cómo se arman en Mac: https://evermeet.cx/ffmpeg/
+En Mac (PAILA para Mac, en prueba): ffmpeg y ffprobe son los armados para macOS que reparte el paquete ffmpeg-static
+(versión b6.1.1: https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1), también GPL-3.0; ffmpeg y ffprobe son del mismo armado.
+Van en PAILA.app/Contents/Resources/app.asar.unpacked/node_modules (ffprobe, en la carpeta del paquete ffprobe-static).
+  Apple Silicon: ffmpeg y ffprobe 6.0. Intel: ffmpeg y ffprobe 6.1.1 (armado de evermeet.cx). Código fuente de FFmpeg 6.0:
+  https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz (la 6.1.1, arriba).
+  Cómo se arman los de Intel: https://evermeet.cx/ffmpeg/
 
 Código fuente junto a cada versión: en https://github.com/epitelio-ar/PAILA/releases, cada versión de PAILA trae adjunto el código fuente
 exacto de los programas de FFmpeg que viajan con ella (ffmpeg-<versión>.tar.xz de ffmpeg.org, uno por versión de arriba) y

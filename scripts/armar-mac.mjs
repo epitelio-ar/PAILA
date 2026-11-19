@@ -1,10 +1,11 @@
 // Arma PAILA para Mac: un .dmg para Apple Silicon (arm64) y otro para Intel (x64), sin la firma de Apple (firma "ad hoc", la
 // mínima para que una Mac con Apple Silicon lo deje correr; la de Apple se decide más adelante). Solo corre en una Mac: lo usa GitHub
 // (.github/workflows/mac.yml). Antes de cada procesador deja en su lugar lo que es propio de él: ffmpeg (ffmpeg-static baja
-// uno solo, el de la Mac que arma), mpv (scripts/mpv-mac.mjs) y el sockseek con freno (apps/napia/sockseek-freno/armar.sh,
+// uno solo, el de la Mac que arma), ffprobe (el del mismo armado que ese ffmpeg, revisado con su huella), mpv (scripts/mpv-mac.mjs) y el sockseek con freno (apps/napia/sockseek-freno/armar.sh,
 // en apps/napia/recursos/sockseek-mac/<arch>). Beat This! es el mismo para los dos (npm run modelos:armar).
 // Uso: npm run dist:mac   o   node scripts/armar-mac.mjs [--arch arm64,x64] [--dir]   (--dir: solo la .app, sin .dmg)
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -39,6 +40,39 @@ function ffmpegPara(arch) {
   for (const f of [bin, `${bin}.README`, `${bin}.LICENSE`]) fs.rmSync(f, { force: true })
   const r = spawnSync(process.execPath, [path.join(dir, 'install.js')], { cwd: dir, stdio: 'inherit', timeout: 600_000, env: { ...process.env, npm_config_platform: 'darwin', npm_config_arch: arch } })
   if (r.status !== 0 || !lipo(bin).includes(LIPO[arch])) throw new Error(`No se pudo bajar el ffmpeg de Mac para ${arch}`)
+}
+
+/**
+ * ffprobe de Mac: el del mismo armado que el ffmpeg de Mac (la versión b6.1.1 de ffmpeg-static trae los dos juntos), fijado
+ * por su huella. El de ffprobe-static no sirve: el de "Apple Silicon" es en realidad de Intel (en una Mac M1–M4 solo anda con
+ * Rosetta; lo encontró la prueba del armado el 19/11) y el de Intel es un 4.0.2 de 2018 armado por Zeranoe, que ya no existe.
+ * Va en el mismo lugar (node_modules/ffprobe-static/bin/darwin/<arch>), donde PAILA lo busca (packages/core/probe.ts).
+ */
+export const FFPROBE_MAC = {
+  tag: 'b6.1.1',
+  arm64: { version: '6.0', sha256: 'bb2db6f5d8cef919da12fbf592119a987202a8c060a886f3cab091f9cab90b64' },
+  x64: { version: '6.1.1', sha256: 'fa3add0ce901f7241abe0dfc0155d958fc834aca3f8ce61f87cc712ae669c1e0' },
+}
+export const urlFfprobeMac = (arch) => `https://github.com/eugeneware/ffmpeg-static/releases/download/${FFPROBE_MAC.tag}/ffprobe-darwin-${arch}`
+const sha256 = (f) => createHash('sha256').update(fs.readFileSync(f)).digest('hex')
+/** ¿Es ese archivo el ffprobe de Mac esperado para ese procesador? (por su huella) */
+export const esFfprobeMac = (f, arch) => fs.existsSync(f) && sha256(f) === FFPROBE_MAC[arch]?.sha256
+
+/** Pone en node_modules/ffprobe-static el ffprobe de Mac de ese procesador (FFPROBE_MAC), revisado con su huella. */
+async function ffprobePara(arch) {
+  const dir = path.join(path.dirname(require.resolve('ffprobe-static/package.json')), 'bin', 'darwin', arch)
+  const bin = path.join(dir, 'ffprobe')
+  if (!esFfprobeMac(bin, arch)) {
+    const r = await fetch(urlFfprobeMac(arch), { redirect: 'follow' })
+    if (!r.ok) throw new Error(`No se pudo bajar el ffprobe de Mac para ${arch} (${r.status})`)
+    const tmp = `${bin}.bajando`
+    fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(tmp, Buffer.from(await r.arrayBuffer()))
+    if (!esFfprobeMac(tmp, arch)) { fs.rmSync(tmp, { force: true }); throw new Error(`El ffprobe de Mac para ${arch} no es el esperado (huella distinta): no se usa.`) }
+    fs.renameSync(tmp, bin)
+  }
+  fs.chmodSync(bin, 0o755)
+  if (!lipo(bin).includes(LIPO[arch])) throw new Error(`El ffprobe de Mac para ${arch} no es de ese procesador: ${lipo(bin).join(' ')}`)
 }
 
 /**
@@ -103,6 +137,7 @@ async function main() {
       if (mal.length) throw new Error(`No se puede armar para ${arch}:\n- ${mal.join('\n- ')}`)
       console.log(`mpv para Mac (${arch}): ${await prepararMpvMac(arch)}.`)
       ffmpegPara(arch)
+      await ffprobePara(arch)
       await armar(arch, soloApp)
     }
   } finally {
