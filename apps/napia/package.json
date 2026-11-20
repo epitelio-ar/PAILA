@@ -1,7 +1,7 @@
 {
   "name": "napia",
   "productName": "NAPIA",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Panel de control para sockseek (el programa que baja de Soulseek): arma la lista, lo corre y muestra el avance. NAPIA no baja nada: baja sockseek.",
   "license": "AGPL-3.0-or-later",
   "private": true,

@@ -35,11 +35,17 @@ const W = 4096
 /** Un pedazo distinto más chico que esto se guarda tal cual (no vale la pena buscarle partes repetidas). */
 const MIN_SEARCH = 64 * 1024
 
-/** La huella de los bytes de un archivo, sin cargarlo entero en memoria. */
+/**
+ * La huella de los bytes de un archivo, sin cargarlo entero en memoria. Termina cuando el archivo ya se cerró, no cuando se
+ * terminó de leer: en Windows, reemplazar un archivo que PAILA todavía tiene abierto falla, y deshacer el cover.jpg de una
+ * carpeta (que se copia y se compara justo antes) a veces no lo devolvía (tests/tapas-volumen.test.ts en el runner de Windows).
+ */
 export function fileSha1(p: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const h = crypto.createHash('sha1')
-    fs.createReadStream(p).on('data', (c) => h.update(c)).on('error', reject).on('end', () => resolve(h.digest('hex')))
+    let huella: string | null = null
+    fs.createReadStream(p).on('data', (c) => h.update(c)).on('error', reject).on('end', () => { huella = h.digest('hex') })
+      .on('close', () => (huella ? resolve(huella) : reject(new Error(`No se pudo leer ${p}`))))
   })
 }
 

@@ -20,7 +20,7 @@ const T = textos({
   },
   tenesPaila: { es: (v: string) => `Tenés PAILA ${v}.`, en: (v: string) => `You have PAILA ${v}.` },
   ultimaVez: { es: (cuando: string) => ` Última vez que se fijó: ${cuando}.`, en: (cuando: string) => ` Last checked: ${cuando}.` },
-  buscarAlAbrir: { es: 'Buscar versiones nuevas al abrir', en: 'Look for new versions on startup' },
+  buscarAlAbrir: { es: 'Buscar versiones nuevas al abrir PAILA', en: 'Look for new versions when PAILA opens' },
   buscarAlAbrirDetalle: { es: 'Solo pregunta qué versión es la última: no manda nada tuyo.', en: "It only asks which version is the latest: it doesn't send anything of yours." },
   buscando: { es: 'Buscando…', en: 'Looking…' },
   buscarAhora: { es: 'Buscar ahora', en: 'Look now' },

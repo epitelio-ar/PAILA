@@ -36,16 +36,24 @@ Además: duplicados por nombre y por cómo suenan, un mapa de qué ocupa tu disc
 ## Bajarla
 
 - **Windows 10 u 11** (64 bits): el instalador o la versión portable, en [Releases](https://github.com/epitelio-ar/PAILA/releases). La descarga pesa unos 320 MB y el programa instalado ocupa cerca de 1 GB (trae su propio ffmpeg, un reproductor y el modelo de la grilla). Anda sin internet; internet hace falta solo para lo que lo usa.
-- **Mac**: en prueba, todavía sin versión para bajar.
+- **Mac** (macOS 12 o más nuevo): el `.dmg` de [Releases](https://github.com/epitelio-ar/PAILA/releases/latest): `PAILA-mac-arm64-…` para Apple M1 a M4, `PAILA-mac-x64-…` para Intel. Abrilo y arrastrá PAILA a Aplicaciones. Todavía no se actualiza sola: PAILA avisa y abre la página para bajarla.
 - El primer análisis (calidad, BPM y tono) corre de a poco mientras usás la app: con una biblioteca grande puede llevar horas, pero no frena nada.
 - PAILA avisa cuando hay una versión nueva y la instala solo si se lo pedís (se puede apagar en Configuración → Actualizaciones). La portable no se reemplaza sola: abre la página para bajarla.
 
 ### "Windows protegió su PC"
 
-La 1.0, la primera versión pública, sale **sin firma digital** (la pedimos cuando esté afuera: ver [Firma](#firma-de-los-instaladores)). Por eso Windows puede avisar las primeras veces:
+La 1.0, la primera versión pública, sale **sin firma digital** (la vamos a volver a pedir cuando el proyecto sea más conocido: ver [Firma](#firma-de-los-instaladores)). Por eso Windows puede avisar las primeras veces:
 
 1. **SmartScreen** muestra "Windows protegió su PC" y "Editor desconocido": tocá **Más información** → **Ejecutar de todos modos**.
 2. Algunos navegadores dicen que el archivo "no se descarga habitualmente": elegí **Conservar** (en Edge, en los tres puntitos).
+
+### "Apple no pudo verificar PAILA" (Mac)
+
+La versión de Mac no está certificada por Apple (eso pide una cuenta de desarrollador paga), así que la primera vez macOS no la abre:
+
+1. Tocá **OK** (no "Trasladar a la papelera").
+2. Abrí **Ajustes del Sistema** → **Privacidad y seguridad**, bajá hasta el aviso de que se bloqueó PAILA y tocá **Abrir igualmente**. Poné tu contraseña.
+3. De ahí en más abre normal.
 
 ## Privacidad
 
@@ -65,7 +73,7 @@ La 1.0, la primera versión pública, sale **sin firma digital** (la pedimos cua
 
 ## Firma de los instaladores
 
-*Política de firma (code signing policy).*
+*Política de firma ([code signing policy](README.md#code-signing-policy)).*
 
 - Los instaladores de Windows se arman **solo** en GitHub Actions, desde el código de este repositorio ([`.github/workflows/version.yml`](.github/workflows/version.yml)); nunca en la compu de nadie.
 - Cuando el proyecto tenga firma: *Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)*. Se firman solo los programas propios (`PAILA.exe`, el instalador y la portable), nunca los de terceros que viajan adentro (ffmpeg, ffprobe, mpv, sockseek).

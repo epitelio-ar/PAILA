@@ -36,16 +36,24 @@ Also: duplicates by name and by how they sound, a map of what takes up your disk
 ## Download
 
 - **Windows 10 or 11** (64-bit): the installer or the portable version, in [Releases](https://github.com/epitelio-ar/PAILA/releases). The download is about 320 MB and the installed program takes about 1 GB (it brings its own ffmpeg, a player and the beat-grid model). It works offline; the internet is only for the features that need it.
-- **Mac**: being tested, no download yet.
+- **Mac** (macOS 12 or newer): the `.dmg` in [Releases](https://github.com/epitelio-ar/PAILA/releases/latest): `PAILA-mac-arm64-…` for Apple M1 to M4, `PAILA-mac-x64-…` for Intel. Open it and drag PAILA to Applications. It doesn't update itself yet: PAILA lets you know and opens the download page.
 - The first analysis (quality, BPM and key) runs little by little while you use the app: with a big library it can take hours, but it doesn't block anything.
 - PAILA lets you know when there's a new version and only installs it if you ask (you can turn this off in Settings → Updates). The portable version doesn't replace itself: it opens the download page.
 
 ### "Windows protected your PC"
 
-Version 1.0, the first public one, ships **without a digital signature** (we'll ask for one once it's out: see [Signing](#installer-signing)). That's why Windows may warn you the first times:
+Version 1.0, the first public one, ships **without a digital signature** (we'll apply for one again once the project is better known: see [Code signing policy](#code-signing-policy)). That's why Windows may warn you the first times:
 
 1. **SmartScreen** shows "Windows protected your PC" and "Unknown publisher": click **More info** → **Run anyway**.
 2. Some browsers say the file "isn't commonly downloaded": choose **Keep** (in Edge, under the three dots).
+
+### "Apple could not verify PAILA" (Mac)
+
+The Mac version isn't notarized by Apple (that needs a paid developer account), so the first time macOS won't open it:
+
+1. Click **Done** (not "Move to Trash").
+2. Open **System Settings** → **Privacy & Security**, scroll down to the message that says PAILA was blocked and click **Open Anyway**. Enter your password.
+3. From then on it opens normally.
 
 ## Privacy
 
@@ -63,9 +71,7 @@ Version 1.0, the first public one, ships **without a digital signature** (we'll 
 - NAPIA uses a version of sockseek with a connection brake so your home router doesn't freeze (the change and its code are in [`apps/napia/sockseek-freno/`](apps/napia/sockseek-freno/)).
 - **Whatever is downloaded from Soulseek is the responsibility of whoever downloads it.** Soulseek is a network between people: PAILA and NAPIA don't host, offer or choose any file. Respect copyright and the laws of your country.
 
-## Installer signing
-
-*Code signing policy.*
+## Code signing policy
 
 - Windows installers are built **only** on GitHub Actions, from this repository's code ([`.github/workflows/version.yml`](.github/workflows/version.yml)); never on anyone's computer.
 - Once the project is signed: *Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)*. Only the project's own programs are signed (`PAILA.exe`, the installer and the portable version), never the third-party ones bundled inside (ffmpeg, ffprobe, mpv, sockseek).

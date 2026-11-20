@@ -7,7 +7,7 @@ import http from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
 import type { AddressInfo } from 'node:net'
-import { checkForUpdate, compareVersions, downloadUpdate, parseLatestYml } from '@paila/core/updates'
+import { MAX_REINTENTOS, checkForUpdate, compareVersions, downloadUpdate, parseLatestYml, tocaBuscar } from '@paila/core/updates'
 
 const installer = crypto.randomBytes(300_000)
 const sha = crypto.createHash('sha512').update(installer).digest('base64')
@@ -28,6 +28,23 @@ beforeAll(async () => {
   feed = `http://127.0.0.1:${(server.address() as AddressInfo).port}/releases/latest/download/`
 })
 afterAll(() => { server.close(); fs.rmSync(tmp, { recursive: true, force: true }) })
+
+describe('cuándo busca sola', () => {
+  it('una vez al abrir, y nada más si salió bien (nada periódico)', () => {
+    expect(tocaBuscar('quieta', 0)).toBe(true)
+    expect(tocaBuscar('quieta', 1)).toBe(false)
+    expect(tocaBuscar('hay', 1)).toBe(false)
+  })
+  it('si falló (sin internet), reintenta como mucho dos veces', () => {
+    expect(MAX_REINTENTOS).toBe(2)
+    expect(tocaBuscar('error', 1)).toBe(true)
+    expect(tocaBuscar('error', 2)).toBe(true)
+    expect(tocaBuscar('error', 3)).toBe(false)
+  })
+  it('con una versión bajándose o lista, no busca', () => {
+    for (const p of ['bajando', 'lista', 'buscando']) expect(tocaBuscar(p, 1)).toBe(false)
+  })
+})
 
 describe('versiones', () => {
   it('compara números y prereleases', () => {

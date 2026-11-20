@@ -6,7 +6,7 @@ import { execFile, spawn } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { app, ipcMain, shell } from 'electron'
-import { checkForUpdate, cleanDownloads, downloadUpdate, type UpdateInfo } from '@paila/core/updates'
+import { checkForUpdate, cleanDownloads, downloadUpdate, REINTENTAR_MS, tocaBuscar, type UpdateInfo } from '@paila/core/updates'
 import type { UpdateState } from '@paila/shared/types'
 import type { Ctx } from './context'
 import { textos } from '@paila/shared/idioma'
@@ -112,6 +112,13 @@ export function registerUpdates(ctx: Ctx) {
   app.on('will-quit', () => { if (st.onQuit && st.phase === 'lista') runInstaller(false) })
   // lo bajado la vez anterior ya se instaló (o se dejó): no se guarda un instalador de 140 MB para siempre
   try { cleanDownloads(dir, null) } catch { /* si está en uso, queda para la próxima */ }
-  // al abrir, sin apuro: primero que arranque todo lo demás
-  if (st.enabled && st.auto) setTimeout(() => { void check() }, testFeed ? 3000 : 60_000)
+  // Sola: una vez al abrir, después de que arranque lo demás. Si falla (sin internet), reintenta a la media hora, como
+  // mucho dos veces. Nada periódico.
+  let hechos = 0
+  const sola = async () => {
+    if (!st.enabled || !st.auto || !tocaBuscar(st.phase, hechos)) return
+    hechos++
+    if ((await check()).phase === 'error' && tocaBuscar('error', hechos)) setTimeout(() => { void sola() }, REINTENTAR_MS).unref()
+  }
+  setTimeout(() => { void sola() }, testFeed ? 3000 : 15_000)
 }

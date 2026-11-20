@@ -72,7 +72,7 @@ export class Requests {
     const aliases = (name: string) => {
       let v = seen.get(name)
       if (!v) {
-        v = (cache.get<ArtistHit[]>('musicbrainz', artistKey(name))?.data ?? [])
+        v = cache.lista<ArtistHit>('musicbrainz', artistKey(name))
           .filter((h) => h.score >= 90 && (relate(name, h.name, h.aliases) === 'same' || relate(name, h.name, h.aliases) === 'alias')).flatMap((h) => [h.name, ...h.aliases])
         seen.set(name, v)
       }

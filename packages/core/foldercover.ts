@@ -6,6 +6,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { imageInfo, side, type CoverStore } from './coverstore'
 import { num, textos } from '@paila/shared/idioma'
+import { reemplazar } from './reemplazar'
 
 // lo que se ve en Cambios pendientes y el Historial, y por qué no se pudo (el nombre "cover.jpg" no cambia)
 const T = textos({
@@ -65,7 +66,7 @@ export function writeFolderCover(trackPath: string | null, value: string | null,
     if (!bytes) { if (coverFile) (quitar ?? fs.rmSync)(coverFile); return } // guardada en "tapas": deshacer la vuelve a poner
     const tmp = path.join(dir, `.${FOLDER_COVER}.paila-${crypto.randomBytes(3).toString('hex')}`)
     fs.writeFileSync(tmp, bytes)
-    try { fs.renameSync(tmp, coverFile ?? path.join(dir, FOLDER_COVER)) } catch (e) { fs.rmSync(tmp, { force: true }); throw e } // en Windows reemplaza de una vez
+    try { reemplazar(tmp, coverFile ?? path.join(dir, FOLDER_COVER)) } catch (e) { fs.rmSync(tmp, { force: true }); throw e } // en Windows reemplaza de una vez
     if (!fs.readFileSync(coverFile ?? path.join(dir, FOLDER_COVER)).equals(bytes)) throw new Error(T.coverNoQuedo)
   }
   const v = value ? JSON.parse(value) as { ref?: string; data?: string; cover?: object | null; folder?: object | null } : null

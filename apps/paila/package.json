@@ -1,7 +1,7 @@
 {
   "name": "paila",
   "productName": "PAILA",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Ver, ordenar, mejorar y hacer lugar en tu biblioteca de música. Para cualquiera con mucha música, con funciones extra para DJs.",
   "license": "AGPL-3.0-or-later",
   "private": true,

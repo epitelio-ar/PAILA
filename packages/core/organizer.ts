@@ -16,7 +16,7 @@ import { textos } from '@paila/shared/idioma'; import { generoPrincipal } from '
 import { extrasFor } from './organizer-extras'
 import { inRekordbox } from './rbmoving'
 import { anioDe, anioPorDisco, carpetaSegura, numeroDe, collabTargets, duoKey, firstOfList, officialSpelling, rankSpellings, wholeNames } from './organizer-names'
-import { dejadosDe } from './estado-dejar'; import { conFuturo } from './organizer-futuro'; import { anotarCreadas, faltanPorDisco, podar, vaciarOrigen } from './restos'; import { ahora } from './reloj'
+import { dejadosDe } from './estado-dejar'; import { conFuturo } from './organizer-futuro'; import { carpetasDelDisco, clave } from './mayusculas-disco'; import { anotarCreadas, faltanPorDisco, podar, vaciarOrigen } from './restos'; import { ahora } from './reloj'
 
 // Lo que se muestra en la vista previa. Las carpetas que arma ("Varios Artistas", "Desconocido", "Sin género") NO van acá:
 // son nombres que se escriben en el disco y quedan iguales en los dos idiomas.
@@ -131,8 +131,11 @@ export function logMoveUndo(db: Db, u: { logId: number; fileId: number | null; f
   db.prepare('UPDATE moves_log SET undone_at = ? WHERE id = ?').run(new Date().toISOString(), u.logId)
 }
 
-/** ¿Es el mismo archivo con otra extensión? (lo reemplazó o convirtió el Reemplazo: "Tema.mp3" → "Tema.flac"). */
-export const sameButExtension = (a: string, b: string) => a !== b && a.replace(/\.[^./]+$/, '') === b.replace(/\.[^./]+$/, '')
+/**
+ * ¿Es el mismo archivo con otra extensión (lo reemplazó o convirtió el Reemplazo: "Tema.mp3" → "Tema.flac") o escrito con otras
+ * mayúsculas? Al reabrir, el escaneo anota la carpeta como está en el disco ("La Esquina" en vez de "La esquina"): no se movió.
+ */
+export const sameButExtension = (a: string, b: string) => a !== b && clave(a).replace(/\.[^./]+$/, '') === clave(b).replace(/\.[^./]+$/, '')
 
 export class Organizer {
   constructor(private db: Db, private rootPath: (rootId: number) => string | null) {}
@@ -205,6 +208,7 @@ export class Organizer {
         perAlbumDir.set(`${albumKey(r)}|${dirOf(r)}`, (perAlbumDir.get(`${albumKey(r)}|${dirOf(r)}`) ?? 0) + 1)
       }
     }
+    const enDisco = carpetasDelDisco(this.db, this.rootPath) // cada carpeta como ya está escrita (core/mayusculas-disco.ts)
     const looseCompilation = (r: TagRow) => {
       if (!r.albumArtist || !VARIOS.test(r.albumArtist.trim())) return false
       const n = perAlbumDir.get(`${albumKey(r)}|${dirOf(r)}`) ?? 0
@@ -216,7 +220,7 @@ export class Organizer {
       if (set || dejados.has(t.id) || quietos?.has(t.id)) { plan.skipped.push({ fileId: t.id, rel: t.rel, reason: set ? T.set(set) : quietos?.has(t.id) ? T.esperando : T.dejado }); continue }
       const alone = !t.album || (perAlbum.get(albumKey(t)) ?? 0) < 2 || looseCompilation(t)
       // "solo carpetas": la carpeta de la regla con el nombre que ya tiene (01/11: 886 se renombraban por el n.º de pista)
-      const nombre = (x: string | null) => (x && opts.soloCarpetas ? path.posix.join(path.posix.dirname(x), path.posix.basename(t.rel)) : x)
+      const nombre = (x: string | null) => (x ? enDisco(t.rootId, opts.soloCarpetas ? path.posix.join(path.posix.dirname(x), path.posix.basename(t.rel)) : x) : x)
       let to = nombre(targetFor(t, opts, alone))
       if (!to) { plan.skipped.push({ fileId: t.id, rel: t.rel, reason: T.sinTags, motivo: 'sinTags' }); continue }
       if (to === t.rel) { plan.alreadyOk++; continue }
@@ -319,7 +323,7 @@ export class Organizer {
       if (r.fileId != null && r.nowRel !== r.toRel) {
         if (r.trashed || !r.nowRel || !sameButExtension(r.nowRel, r.toRel)) { res.failed.push({ rel: r.toRel, error: T.cambio }); continue }
         src = r.nowRel
-        dst = r.fromRel.replace(/\.[^./]+$/, '') + path.posix.extname(r.nowRel)
+        if (clave(path.posix.extname(r.nowRel)) !== clave(path.posix.extname(r.fromRel))) dst = r.fromRel.replace(/\.[^./]+$/, '') + path.posix.extname(r.nowRel)
       }
       steps.push({ kind: 'mover', op: 'deshacer-organizar', rootId: r.rootId, fileId: r.fileId, src, dst, data: { logId: r.id, fileId: r.fileId, fromRel: dst, toRel: r.toRel } })
     }

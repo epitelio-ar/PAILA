@@ -36,8 +36,8 @@ export function wholeNames(db: Db, rows: { rel: string; artist: string | null; a
       if (!lead?.includes(',') || asked.has(`${lead}|${r.title}`)) continue
       asked.add(`${lead}|${r.title}`)
       for (const k of keys(lead)) {
-        for (const h of cache.get<ArtistHit[]>('musicbrainz', `a:${k}`)?.data ?? []) [h.name, ...h.aliases].forEach(add)
-        if (r.title) for (const h of cache.get<RecHit[]>('musicbrainz', `r:${k}|${loose(r.title)}`)?.data ?? []) h.credit.forEach((c) => add(c.name))
+        for (const h of cache.lista<ArtistHit>('musicbrainz', `a:${k}`)) [h.name, ...h.aliases].forEach(add)
+        if (r.title) for (const h of cache.lista<RecHit>('musicbrainz', `r:${k}|${loose(r.title)}`)) h.credit.forEach((c) => add(c.name))
       }
     }
     if (r.albumArtist?.includes(',') && commaKey(r.albumArtist) !== commaKey(r.artist ?? '')) discs.set(commaKey(r.albumArtist), (discs.get(commaKey(r.albumArtist)) ?? 0) + 1)
@@ -70,7 +70,7 @@ export function officialSpelling(db: Db, rows: { artist: string | null; title: s
   const deezer = new Map<string, Set<string>>() // nombre en minúsculas → cómo lo escribe Deezer
   for (const r of rows) {
     if (!r.artist || !r.title) continue
-    for (const h of cache.get<RecHit[]>('deezer', recKey(r.artist, r.title))?.data ?? []) for (const c of h.credit) {
+    for (const h of cache.lista<RecHit>('deezer', recKey(r.artist, r.title))) for (const c of h.credit) {
       const k = c.name.toLowerCase(), set = deezer.get(k) ?? new Set<string>()
       set.add(c.name); deezer.set(k, set)
     }
@@ -79,7 +79,7 @@ export function officialSpelling(db: Db, rows: { artist: string | null; title: s
   return (name) => {
     const k = name.toLowerCase()
     if (!memo.has(k)) {
-      const mb = (cache.get<ArtistHit[]>('musicbrainz', `a:${loose(name)}`)?.data ?? []).find((h) => h.score >= 95 && h.name.toLowerCase() === k)?.name ?? null
+      const mb = cache.lista<ArtistHit>('musicbrainz', `a:${loose(name)}`).find((h) => h.score >= 95 && h.name.toLowerCase() === k)?.name ?? null
       const dz = deezer.get(k)
       memo.set(k, mb && (!dz || (dz.size === 1 && dz.has(mb))) ? mb : null)
     }

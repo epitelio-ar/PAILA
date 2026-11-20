@@ -5,6 +5,15 @@ What changed in each version, in a few words. The newest is at the top. PAILA sh
 <!-- The English version of docs/NOVEDADES.md: every version needs its entry in both files, with the same "## X.Y.Z · day/month/year: title"
      header (the date stays day/month/year). Simple points, no jargon. npm run version:subir checks both. -->
 
+## 1.0.2 · 20/11/2026: undoing Organize without surprises, and the Mac
+
+- **Undoing Organize works even if you closed PAILA:** if a folder already existed with different capital letters ("La Esquina del Infinito" and "La esquina del infinito"), some tracks didn't go back to their place after reopening PAILA. Now they all do.
+- **Organize no longer moves tracks just to change a folder's capital letters:** if the folder already exists written another way, the tracks go into that one, as it is.
+- **Organize doesn't stop when MusicBrainz asks to slow down:** before, the list showed an error and wasn't built. Now it goes on with what it has and looks up the rest later.
+- **Undoing a folder's cover is safer on Windows:** sometimes it didn't bring back the previous cover. That no longer happens.
+- **If there's no internet when it opens, it tries again:** PAILA checks once when it opens; if there's no internet at that moment, it tries again half an hour later, up to two times.
+- **The Mac, explained:** PAILA's page says which file to download for your Mac and how to open it the first time.
+
 ## 1.0.1 · 16/11/2026: easier download and internal fixes
 
 - **Downloading PAILA is easier:** each version's page has the direct links to the installer, the portable version and the Mac version right at the top.

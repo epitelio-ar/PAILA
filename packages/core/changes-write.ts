@@ -17,6 +17,7 @@ import { readSeratoTag } from './seratotag'
 import { readDjTag } from './djtag'
 import { fileSha1, rebuild, readDelta, saveDelta } from './ops/delta'
 import { savedOf, type SavedFile } from './ops/backup'
+import { reemplazar as replace } from './reemplazar'
 
 export type FileField = TagField | 'cover' | 'replaygain' | 'comment' | 'serato' | 'bpm' | 'key'
 /** Lo que necesita la escritura de Cambios pendientes. */
@@ -56,19 +57,6 @@ function storedHash(db: Db, fileId: number, file: string): string | null {
 function sync(file: string) {
   const fd = fs.openSync(file, 'r+')
   try { fs.fsyncSync(fd) } finally { fs.closeSync(fd) }
-}
-
-/**
- * El temporal reemplaza al archivo de una vez (en Windows y en Mac, un renombre no queda a medias). Un antivirus o el
- * indexador de Windows que justo está leyendo uno de los dos lo puede trabar un instante: se reintenta unas veces.
- */
-function replace(tmp: string, file: string) {
-  for (let i = 0; ; i++) {
-    try { fs.renameSync(tmp, file); return } catch (e) {
-      if (i >= 8 || !['EPERM', 'EBUSY', 'EACCES'].includes((e as NodeJS.ErrnoException).code ?? '')) throw e
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50 * (i + 1))
-    }
-  }
 }
 
 /**

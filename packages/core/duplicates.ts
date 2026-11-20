@@ -1,9 +1,8 @@
 // Duplicados: el mismo archivo copiado, el mismo audio en otra calidad (por la huella acústica), versiones del mismo tema
 // (radio edit, extended, remix: se muestran juntas pero NO son duplicados) y los probables por nombre (mismos tags y duración).
 // Solo propone: mandar a la papelera lo decide el usuario. Los sample packs ("produccion") nunca entran.
-import crypto from 'node:crypto'
-import fs from 'node:fs'
 import { allRows, visible, type Db } from './db'
+import { fileSha1 } from './ops/delta'
 import { buildFromDb, fingerprintOf } from './soundindex'
 import { DIFFERENT_SIM, FRAMES_PER_SECOND, VERSION_SECONDS, bestAlignment, closeLength, sameLength, soundRelation, soundsAlike, withShared, type Alignment } from './soundmatch'
 import { GENERIC_TITLES, namesSayDifferent, normalize, otherRecording, titleCore, titlesDisagree } from './dupnames'
@@ -18,13 +17,6 @@ export type { DupLevel }
 export { isCopyName, normalize, titleCore } from './dupnames'
 export { soundRelation } from './soundmatch'
 export { pickKeeper } from './dupkeeper'
-
-async function sha1(file: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const h = crypto.createHash('sha1')
-    fs.createReadStream(file).on('data', (c) => h.update(c)).on('end', () => resolve(h.digest('hex'))).on('error', reject)
-  })
-}
 
 /** Uniones de conjuntos (para armar los grupos a partir de pares). */
 class Groups {
@@ -85,7 +77,7 @@ export async function findDuplicates(
       const p = pathOf(r.id)
       if (!p) continue
       onProgress(r.rel, hashed++, totalFiles)
-      try { const h = await sha1(p); byHash.set(h, [...(byHash.get(h) ?? []), r]) } catch { /* ilegible: se saltea */ }
+      try { const h = await fileSha1(p); byHash.set(h, [...(byHash.get(h) ?? []), r]) } catch { /* ilegible: se saltea */ }
     }
     for (const g of byHash.values()) for (let i = 1; i < g.length; i++) link(g[0].id, g[i].id, 'archivo')
   }

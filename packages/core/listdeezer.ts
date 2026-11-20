@@ -50,7 +50,7 @@ export function deezerIndex(db: Db, lib: { id: number; artist: string | null; ti
   for (const t of lib) {
     const names = [t.artist && t.title ? { artist: t.artist, title: stripJunk(t.title) } : null, t.guess ?? null].filter((n): n is { artist: string; title: string } => !!n)
     for (const n of names) {
-      for (const h of cache.get<RecHit[]>('deezer', recKey(n.artist, n.title))?.data ?? []) {
+      for (const h of cache.lista<RecHit>('deezer', recKey(n.artist, n.title))) {
         for (const k of hitKeys(h)) byHit.set(k, (byHit.get(k) ?? new Set()).add(t.id))
       }
     }

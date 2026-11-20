@@ -5,6 +5,15 @@ Qué cambió en cada versión, en pocas palabras. La de arriba es la más nueva.
 <!-- Para sumar una versión: una sección "## X.Y.Z · día/mes/año: título corto" arriba de todo, con puntos simples
      (sin jerga; si hace falta una palabra técnica, explicarla). Después: npm run version:subir -- X.Y.Z -->
 
+## 1.0.2 · 20/11/2026: deshacer Ordenar sin sorpresas, y la Mac
+
+- **Deshacer Ordenar anda aunque hayas cerrado PAILA:** si una carpeta ya existía con otras mayúsculas ("La Esquina del Infinito" y "La esquina del infinito"), al volver a abrir PAILA algunos temas no volvían a su lugar. Ahora vuelven todos.
+- **Ordenar ya no mueve temas solo para cambiar las mayúsculas de una carpeta:** si la carpeta ya existe escrita de otra forma, los temas van a esa, como está.
+- **Ordenar no se corta si MusicBrainz pide ir más despacio:** antes la lista mostraba un error y no se armaba. Ahora sigue con lo que hay y busca lo que falta después.
+- **Deshacer la tapa de una carpeta es más seguro en Windows:** a veces no devolvía la tapa de antes. Ya no pasa.
+- **Si no hay internet al abrir, vuelve a probar:** PAILA se fija una vez al abrir si hay una versión nueva; si en ese momento no hay internet, vuelve a probar a la media hora, hasta dos veces.
+- **La Mac, explicada:** la página de PAILA dice qué archivo bajar para tu Mac y cómo abrirla la primera vez.
+
 ## 1.0.1 · 16/11/2026: descarga más fácil y arreglos internos
 
 - **Bajar PAILA es más fácil:** la página de cada versión trae arriba de todo los links directos al instalador, a la versión portable y a la de Mac.

@@ -53,6 +53,19 @@ export function compareVersions(a: string, b: string): number {
 
 const trimSlash = (u: string) => u.replace(/\/+$/, '')
 
+/** Si la búsqueda al abrir falló (sin internet, GitHub caído), se reintenta a la media hora, como mucho dos veces. */
+export const REINTENTAR_MS = 30 * 60 * 1000
+export const MAX_REINTENTOS = 2
+
+/**
+ * ¿Toca buscar sola una versión nueva? Una vez al abrir; después, solo si esa búsqueda falló, hasta MAX_REINTENTOS veces.
+ * Nada periódico (el autor, 17/11: buscar cada tantas horas es gastar de más). `hechos` = búsquedas solas ya hechas.
+ */
+export function tocaBuscar(phase: string, hechos: number): boolean {
+  if (hechos === 0) return phase === 'quieta' || phase === 'error'
+  return phase === 'error' && hechos <= MAX_REINTENTOS
+}
+
 /**
  * Pregunta si hay una versión más nueva que `current` en `feed` (la carpeta donde están latest.yml y el instalador; en
  * GitHub, `https://github.com/<dueño>/<repo>/releases/latest/download`). Null si no hay o si `skip` es esa versión.
